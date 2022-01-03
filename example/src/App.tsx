@@ -63,7 +63,7 @@ const content = {
 function App() {
 
   const extensions = useCallback(() => [
-    // new NoteExtension({}),
+    new NoteExtension({}),
     new DropCursorExtension(),
     new BoldExtension(),
     new ItalicExtension(),

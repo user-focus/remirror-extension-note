@@ -27,6 +27,8 @@
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
   "peerDependencies": {
+    "@remirror/pm": "^1.0.9",
+    "@remirror/react": "^1.0.19",
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },
