@@ -1,0 +1,36 @@
+{
+  "name": "remirror-extension-note",
+  "version": "1.0.0",
+  "description": "A note extension build for remirror",
+  "author": "Santosh Viswanatham",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@remirror/pm": "^1.0.9",
+    "@remirror/react": "^1.0.19",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "remirror": "^1.0.54",
+    "typescript": "^4.5.4"
+  },
+  "scripts": {
+    "build": "yarn build:esm && yarn build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir lib/cjs"
+  },
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "dependencies": {
+    "@linaria/babel-preset": "^3.0.0-beta.15",
+    "@linaria/core": "^3.0.0-beta.15",
+    "@linaria/react": "^3.0.0-beta.15",
+    "@linaria/shaker": "^3.0.0-beta.15"
+  }
+}
