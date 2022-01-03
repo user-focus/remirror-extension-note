@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback } from 'react';
 // import logo from './logo.svg';
 import './App.css';
