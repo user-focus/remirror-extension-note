@@ -7,7 +7,6 @@ import {
   extension,
   ExtensionPriority,
   ExtensionTag,
-  findUploadPlaceholderPayload,
   getTextSelection,
   Handler,
   keyBinding,
@@ -20,7 +19,6 @@ import {
   PrimitiveSelection,
   ProsemirrorNode,
   Transaction,
-  UploadPlaceholderPayload,
 } from '@remirror/core';
 import { NodeViewComponentProps } from '@remirror/react';
 
@@ -59,11 +57,12 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   }
 
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
-    const payload: UploadPlaceholderPayload<NoteAttributes> | undefined =
-      findUploadPlaceholderPayload(props.view.state, props.node.attrs.id);
-    const context = payload?.context;
-    const abort = () => payload?.fileUploader.abort();
-    return this.options.render({ ...props, context, abort });
+    // const payload: UploadPlaceholderPayload<NoteAttributes> | undefined =
+    //   findUploadPlaceholderPayload(props.view.state, props.node.attrs.id);
+    // const context = payload?.context;
+    // const abort = () => payload?.fileUploader.abort();
+    // return this.options.render({ ...props, context, abort });
+    return this.options.render({ ...props, abort: () => { }, context: undefined });
   };
 
   createTags() {
