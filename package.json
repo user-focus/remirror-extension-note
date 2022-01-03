@@ -1,10 +1,13 @@
 {
   "name": "remirror-extension-note",
-  "version": "1.0.0",
-  "description": "A note extension build for remirror",
+  "version": "1.0.1",
+  "description": "A note extension built for remirror rich text editor",
   "author": "Santosh Viswanatham",
   "license": "MIT",
   "private": false,
+  "files": [
+    "/lib"
+  ],
   "devDependencies": {
     "@remirror/pm": "^1.0.9",
     "@remirror/react": "^1.0.19",
