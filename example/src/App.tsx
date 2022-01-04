@@ -45,18 +45,18 @@ const content = {
         },
       ],
     },
-    // {
-    //   type: 'note',
-    //   attrs: {
-    //     id: null,
-    //     url: 'https://app.heymarvin.com/annotation_tool/event/250a71fb-de29-44b2-bd9f-16c5e44f90bf/',
-    //     title: 'What do you like the most?',
-    //     description: 'People have been asking for a way to sort the order of playlist. This has been asked before this also.',
-    //     duration: '1m 50s',
-    //     interviewName: 'Talk with lattice',
-    //     error: null,
-    //   },
-    // },
+    {
+      type: 'note',
+      attrs: {
+        id: null,
+        url: 'https://app.heymarvin.com/annotation_tool/event/250a71fb-de29-44b2-bd9f-16c5e44f90bf/',
+        title: 'What do you like the most?',
+        description: 'People have been asking for a way to sort the order of playlist. This has been asked before this also.',
+        duration: '1m 50s',
+        interviewName: 'Talk with lattice',
+        error: null,
+      },
+    },
   ],
 };
 
