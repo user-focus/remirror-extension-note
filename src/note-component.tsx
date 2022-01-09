@@ -9,10 +9,10 @@ export type NoteComponentProps = NodeViewComponentProps & {
   abort: () => void;
 };
 
-function openNote(url: string | undefined): void {
-  // opens url in new tab
-  window.open(url, "_blank");
-}
+// function openNote(url: string | undefined): void {
+//   // opens url in new tab
+//   window.open(url, "_blank");
+// }
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
   const attrs = node.attrs as NoteAttributes;

@@ -1,5 +1,3 @@
-import { NoteAttributes, NoteOptions } from "./note-extension";
-import { NoteExtension } from "./note-extension";
+import { NoteEditorComponent } from "./note-editor-component";
 
-export type { NoteAttributes, NoteOptions };
-export default NoteExtension;
+export default NoteEditorComponent;

@@ -3,25 +3,7 @@ import React, { useCallback } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 
-import 'remirror/styles/all.css';
-
-import { Remirror, useRemirror } from '@remirror/react';
-import {
-  BlockquoteExtension,
-  BoldExtension,
-  BulletListExtension,
-  CalloutExtension,
-  DropCursorExtension,
-  HeadingExtension,
-  HorizontalRuleExtension,
-  ImageExtension,
-  ItalicExtension, LinkExtension,
-  NodeFormattingExtension,
-  OrderedListExtension,
-  TaskListExtension,
-  UnderlineExtension,
-} from 'remirror/extensions';
-import NoteExtension from 'typescript-react-test';
+import NoteEditorComponent from 'typescript-react-test';
 
 const DummyNoteObject = {
   id: null,
@@ -61,34 +43,8 @@ const content = {
 };
 
 function App() {
-
-  const extensions = useCallback(() => [
-    new NoteExtension({}),
-    new DropCursorExtension(),
-    new BoldExtension(),
-    new ItalicExtension(),
-    new CalloutExtension(),
-    new LinkExtension({ autoLink: true }),
-    new UnderlineExtension(),
-    new BlockquoteExtension(),
-    new HorizontalRuleExtension(),
-    new BulletListExtension(),
-    new OrderedListExtension(),
-    new TaskListExtension(),
-    new ImageExtension({ enableResizing: true }),
-    new NodeFormattingExtension(),
-    new HeadingExtension(),
-    // new PlaceholderExtension({ placeholder: `Type : to insert emojis` }),
-  ], []);
-
-  const { manager, state, onChange } = useRemirror({ extensions, content });
-
-
   return (
-    <div className='remirror-theme'>
-      {/* the className is used to define css variables necessary for the editor */}
-      <Remirror manager={manager} initialContent={state} />
-    </div>
+    <NoteEditorComponent />
   );
 }
 
