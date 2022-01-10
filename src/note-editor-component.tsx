@@ -3,41 +3,41 @@ import React from "react";
 import 'remirror/styles/all.css';
 
 import { Remirror, useRemirror } from '@remirror/react';
-// import {
-//   BlockquoteExtension,
-//   BoldExtension,
-//   BulletListExtension,
-//   CalloutExtension,
-//   DropCursorExtension,
-//   HeadingExtension,
-//   HorizontalRuleExtension,
-//   ImageExtension,
-//   ItalicExtension, LinkExtension,
-//   NodeFormattingExtension,
-//   OrderedListExtension,
-//   TaskListExtension,
-//   UnderlineExtension,
-// } from 'remirror/extensions';
-// import { NoteExtension } from "./note-extension";
+import {
+  BlockquoteExtension,
+  BoldExtension,
+  BulletListExtension,
+  CalloutExtension,
+  DropCursorExtension,
+  HeadingExtension,
+  HorizontalRuleExtension,
+  ImageExtension,
+  ItalicExtension, LinkExtension,
+  NodeFormattingExtension,
+  OrderedListExtension,
+  TaskListExtension,
+  UnderlineExtension,
+} from 'remirror/extensions';
+import { NoteExtension } from "./note-extension";
 
-// const extensions = () => [
-//   new NoteExtension({}),
-//   new DropCursorExtension(),
-//   new BoldExtension(),
-//   new ItalicExtension(),
-//   new CalloutExtension(),
-//   new LinkExtension({ autoLink: true }),
-//   new UnderlineExtension(),
-//   new BlockquoteExtension(),
-//   new HorizontalRuleExtension(),
-//   new BulletListExtension(),
-//   new OrderedListExtension(),
-//   new TaskListExtension(),
-//   new ImageExtension({ enableResizing: true }),
-//   new NodeFormattingExtension(),
-//   new HeadingExtension(),
-//   // new PlaceholderExtension({ placeholder: `Type : to insert emojis` }),
-// ];
+const extensions = () => [
+  new NoteExtension({}),
+  new DropCursorExtension(),
+  new BoldExtension(),
+  new ItalicExtension(),
+  new CalloutExtension(),
+  new LinkExtension({ autoLink: true }),
+  new UnderlineExtension(),
+  new BlockquoteExtension(),
+  new HorizontalRuleExtension(),
+  new BulletListExtension(),
+  new OrderedListExtension(),
+  new TaskListExtension(),
+  new ImageExtension({ enableResizing: true }),
+  new NodeFormattingExtension(),
+  new HeadingExtension(),
+  // new PlaceholderExtension({ placeholder: `Type : to insert emojis` }),
+];
 
 const content = {
   type: 'doc',
@@ -68,8 +68,8 @@ const content = {
 
 export const NoteEditorComponent = () => {
 
-  // const { manager, state } = useRemirror({ extensions, content });
-  const { manager, state } = useRemirror({ content: content });
+  const { manager, state } = useRemirror({ extensions, content });
+  // const { manager, state } = useRemirror({ content});
 
 
   return (
