@@ -1,3 +1,3 @@
-import { NoteEditorComponent } from "./note-editor-component";
+import { NoteExtension } from "./note-extension";
 
-export default NoteEditorComponent;
+export default NoteExtension;

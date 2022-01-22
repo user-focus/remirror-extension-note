@@ -28,14 +28,6 @@ export interface NoteOptions {
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   /**
-   * A regex test for the file type when users paste files.
-   *
-   * @default /^((?!image).)*$/i - Only match non-image files, as image files
-   * will be handled by the `ImageExtension`.
-   */
-  pasteRuleRegexp?: RegExp;
-
-  /**
    * Called after the `commands.deleteFile` has been called.
    */
   onDeleteFile?: Handler<(props: { tr: Transaction; pos: number; node: ProsemirrorNode }) => void>;
@@ -47,7 +39,6 @@ export interface NoteOptions {
 @extension<NoteOptions>({
   defaultOptions: {
     render: NoteComponent,
-    pasteRuleRegexp: /^((?!image).)*$/i,
   },
   handlerKeys: ['onDeleteFile'],
 })
@@ -57,11 +48,6 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   }
 
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
-    // const payload: UploadPlaceholderPayload<NoteAttributes> | undefined =
-    //   findUploadPlaceholderPayload(props.view.state, props.node.attrs.id);
-    // const context = payload?.context;
-    // const abort = () => payload?.fileUploader.abort();
-    // return this.options.render({ ...props, context, abort });
     return this.options.render({ ...props, abort: () => { }, context: undefined });
   };
 
@@ -79,6 +65,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         description: { default: '' },
         duration: { default: '' },
         interviewName: { default: '' },
+        createdBy: { default: '' },
+        createdAt: { default: '' },
+        labels: { default: [] },
+        noteUrl: { default: '' },
         error: { default: null },
       },
       selectable: true,
@@ -97,6 +87,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const description = anchor.getAttribute('data-description');
             const duration = anchor.getAttribute('data-duration');
             const interviewName = anchor.getAttribute('data-interview-name');
+            const createdBy = anchor.getAttribute('data-created-by');
+            const createdAt = anchor.getAttribute('data-created-at');
+            const labels = JSON.parse(anchor.getAttribute('data-labels') ?? '[]');
+            const noteUrl = anchor.getAttribute('data-note-url');
 
             return {
               ...extra.parse(dom),
@@ -105,6 +99,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               description,
               duration,
               interviewName,
+              createdBy,
+              createdAt,
+              labels,
+              noteUrl,
             };
           },
         },
@@ -120,6 +118,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-description': node.attrs.description,
           'data-duration': node.attrs.duration,
           'data-interview-name': node.attrs.interviewName,
+          'data-created-by': node.attrs.createdBy,
+          'data-created-at': node.attrs.createdAt,
+          'data-labels': JSON.stringify(node.attrs.labels),
+          'data-note-url': node.attrs.noteUrl,
         };
 
         if (error) {
@@ -152,20 +154,6 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         tr.delete(pos, pos + 1).scrollIntoView();
         this.options.onDeleteFile({ tr, pos, node });
         dispatch?.(tr);
-        return true;
-      }
-
-      return false;
-    };
-  }
-
-  @command()
-  renameFile(pos: number, fileName: string): CommandFunction {
-    return ({ tr, state, dispatch }) => {
-      const node = state.doc.nodeAt(pos);
-
-      if (node && node.type === this.type) {
-        dispatch?.(tr.setNodeMarkup(pos, undefined, { ...node.attrs, fileName }));
         return true;
       }
 
@@ -232,6 +220,11 @@ export interface NoteAttributes {
    * name of the interview
    */
   interviewName?: string;
+
+  createdAt?: string;
+  createdBy?: string;
+  labels?: any[];
+  noteUrl?: string;
 
   /**
    * Error state for the file, e.g. upload failed
