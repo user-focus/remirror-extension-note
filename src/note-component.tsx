@@ -39,8 +39,12 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
           </div>
         ))}
       </div>
-      <p className="NOTE_TITLE">{attrs.title}</p>
-      <p className="NOTE_DESCRIPTION">{attrs.description}</p>
+      {attrs.title && attrs.title.length > 0 && (
+        <p className="NOTE_TITLE">{attrs.title}</p>
+      )}
+      {attrs.description && attrs.description.length > 0 && (
+        <p className="NOTE_DESCRIPTION">{attrs.description}</p>
+      )}
 
       <div className="NOTE_FOOTER_WRAPPER">
         <p className="NOTE_CREATED_BY">{attrs.createdBy}</p>
