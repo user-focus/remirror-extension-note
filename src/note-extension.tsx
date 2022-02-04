@@ -28,6 +28,14 @@ export interface NoteOptions {
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   /**
+   * A regex test for the file type when users paste files.
+   *
+   * @default /^((?!image).)*$/i - Only match non-image files, as image files
+   * will be handled by the `ImageExtension`.
+   */
+  pasteRuleRegexp?: RegExp;
+
+  /**
    * Called after the `commands.deleteFile` has been called.
    */
   onDeleteFile?: Handler<(props: { tr: Transaction; pos: number; node: ProsemirrorNode }) => void>;
@@ -39,6 +47,7 @@ export interface NoteOptions {
 @extension<NoteOptions>({
   defaultOptions: {
     render: NoteComponent,
+    pasteRuleRegexp: /^((?!image).)*$/i,
   },
   handlerKeys: ['onDeleteFile'],
 })
@@ -60,7 +69,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       attrs: {
         ...extra.defaults(),
         id: { default: null },
-        url: { default: '' },
+        interviewUrl: { default: '' },
         title: { default: '' },
         description: { default: '' },
         duration: { default: '' },
@@ -82,7 +91,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           priority: ExtensionPriority.Low,
           getAttrs: (dom) => {
             const anchor = dom as HTMLAnchorElement;
-            const url = anchor.getAttribute('data-url');
+            const id = anchor.getAttribute('data-id');
+            const interviewUrl = anchor.getAttribute('data-interview-url');
             const title = anchor.getAttribute('data-title');
             const description = anchor.getAttribute('data-description');
             const duration = anchor.getAttribute('data-duration');
@@ -94,7 +104,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
 
             return {
               ...extra.parse(dom),
-              url,
+              id,
+              interviewUrl,
               title,
               description,
               duration,
@@ -109,11 +120,12 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         ...(override.parseDOM ?? []),
       ],
       toDOM: (node) => {
-        const { url, error, ...rest } = omitExtraAttributes(node.attrs, extra);
+        const { error, ...rest } = omitExtraAttributes(node.attrs, extra);
         const attrs: DOMCompatibleAttributes = {
           ...extra.dom(node),
           ...rest,
-          'data-url': url,
+          'data-id': node.attrs.id,
+          'data-interview-url': node.attrs.interviewUrl,
           'data-title': node.attrs.title,
           'data-description': node.attrs.description,
           'data-duration': node.attrs.duration,
@@ -199,7 +211,7 @@ export interface NoteAttributes {
   /**
    * URL where the clipping
    */
-  url?: string;
+  interviewUrl?: string;
 
   /**
    * title of the note
@@ -207,7 +219,9 @@ export interface NoteAttributes {
   title?: string;
 
   /**
-   * Mime type of the file, e.g. "image/jpeg"
+   * description of the note
+   * @default ''
+   * @optional
    */
   description?: string;
 
@@ -222,8 +236,17 @@ export interface NoteAttributes {
   interviewName?: string;
 
   createdAt?: string;
+
   createdBy?: string;
+
   labels?: any[];
+
+  /**
+   * URL where the note can be viewed
+   * @default ''
+   * @optional
+   * @example /annotation_tool/event/c83282e7-a12e-4148-8382-d6a550fce7cb/
+   */
   noteUrl?: string;
 
   /**

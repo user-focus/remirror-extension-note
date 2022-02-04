@@ -24,13 +24,14 @@ const LabelSeperator = () => {
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
   const attrs = node.attrs as NoteAttributes;
+  const { noteUrl, labels, title, description, createdBy, createdAt, interviewName } = attrs;
   return (
     <div
       className="NOTE_ROOT"
-      onClick={() => openNote(attrs.noteUrl)}
+      onClick={() => openNote(noteUrl)}
     >
       <div className="NOTE_LABELS_CONTAINER">
-        {attrs.labels && Array.isArray(attrs.labels) && attrs.labels.map((label) => (
+        {labels && Array.isArray(labels) && labels.map((label) => (
           <div className="NOTE_LABEL" key={label.id}>
             {label.parent && label.parent.length > 0 && label.parent.map((parent: any) => (
               <span key={parent.id}>{`${parent.text}`}<LabelSeperator /></span>
@@ -39,19 +40,19 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
           </div>
         ))}
       </div>
-      {attrs.title && attrs.title.length > 0 && (
-        <p className="NOTE_TITLE">{attrs.title}</p>
+      {title && title.length > 0 && (
+        <p className="NOTE_TITLE">{title}</p>
       )}
-      {attrs.description && attrs.description.length > 0 && (
-        <p className="NOTE_DESCRIPTION">{attrs.description}</p>
+      {description && description.length > 0 && (
+        <p className="NOTE_DESCRIPTION">{description}</p>
       )}
 
       <div className="NOTE_FOOTER_WRAPPER">
-        <p className="NOTE_CREATED_BY">{attrs.createdBy}</p>
+        <p className="NOTE_CREATED_BY">{createdBy}</p>
         <div className="bullet"> </div>
-        <p className="NOTE_CREATED_AT">{attrs.createdAt}</p>
+        <p className="NOTE_CREATED_AT">{createdAt}</p>
         <div className="bullet"> </div>
-        <p className="NOTE_INTERVIEW_NAME">Source: {attrs.interviewName}</p>
+        <p className="NOTE_INTERVIEW_NAME">Source: {interviewName}</p>
       </div>
     </div >
   );
