@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { UploadContext } from "@remirror/core";
-import { NodeViewComponentProps } from "@remirror/react";
+import { NodeViewComponentProps, useCommands } from "@remirror/react";
 
 import type { NoteAttributes } from "./note-extension";
 
@@ -8,11 +8,6 @@ export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
   abort: () => void;
 };
-
-function openNote(url: string | undefined): void {
-  // opens url in new tab
-  window.open(url, "_blank");
-}
 
 const LabelSeperator = () => {
   return (
@@ -22,14 +17,23 @@ const LabelSeperator = () => {
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
   const attrs = node.attrs as NoteAttributes;
-  const { noteUrl, labels, title, description, createdBy, createdAt, interviewName } = attrs;
+  const { labels, title, description, createdBy, createdAt, interviewName } = attrs;
+  const { deleteFile } = useCommands();
+  const position = getPosition as () => number;
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const deleteNote = () => {
+    deleteFile(position());
+  };
+
+  const toggleDropdownMenu = () => {
+    setShowDropdown(!showDropdown);
+  }
+
   return (
-    <div
-      className="NOTE_ROOT"
-      onClick={() => openNote(noteUrl)}
-    >
+    <div className="NOTE_ROOT">
       <div className="NOTE_LABELS_CONTAINER">
         {labels && Array.isArray(labels) && labels.map((label) => (
           <div className="NOTE_LABEL" key={label.id}>
@@ -48,12 +52,42 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node }) => {
       )}
 
       <div className="NOTE_FOOTER_WRAPPER">
-        <p className="NOTE_CREATED_BY">{createdBy}</p>
-        <div className="bullet"> </div>
-        <p className="NOTE_CREATED_AT">{createdAt}</p>
-        <div className="bullet"> </div>
-        <p className="NOTE_INTERVIEW_NAME">Source: {interviewName}</p>
+        <div>
+          <p className="NOTE_CREATED_BY">{createdBy}</p>
+          <div className="bullet"> </div>
+          <p className="NOTE_CREATED_AT">{createdAt}</p>
+          <div className="bullet"> </div>
+          <p className="NOTE_INTERVIEW_NAME">Source: {interviewName}</p>
+        </div>
+        <div className="more-options-container">
+          <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
+          {showDropdown && (
+            <div className="dropdown-content">
+              <button onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
+            </div>
+          )}
+        </div>
       </div>
     </div >
   );
 };
+
+const MoreOptionsIcon = () => {
+  return (
+    <svg width="3" height="15" viewBox="0 0 3 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1.5" cy="1.5" r="1.5" fill="#8C95A8" />
+      <circle cx="1.5" cy="7.5" r="1.5" fill="#8C95A8" />
+      <circle cx="1.5" cy="13.5" r="1.5" fill="#8C95A8" />
+    </svg>
+  );
+}
+
+const DeleteIcon = () => {
+  return (
+    <svg width="3" height="15" viewBox="0 0 3 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1.5" cy="1.5" r="1.5" fill="#8C95A8" />
+      <circle cx="1.5" cy="7.5" r="1.5" fill="#8C95A8" />
+      <circle cx="1.5" cy="13.5" r="1.5" fill="#8C95A8" />
+    </svg>
+  )
+}

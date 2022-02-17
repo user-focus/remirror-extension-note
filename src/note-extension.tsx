@@ -21,6 +21,8 @@ import {
   Transaction,
 } from '@remirror/core';
 import { NodeViewComponentProps } from '@remirror/react';
+// import { PasteRule } from '@remirror/pm/paste-rules';
+import type { CreateEventHandlers } from '@remirror/extension-events';
 
 import { NoteComponent, NoteComponentProps } from './note-component';
 
@@ -36,6 +38,11 @@ export interface NoteOptions {
   pasteRuleRegexp?: RegExp;
 
   /**
+   * Listen to click events for links.
+   */
+  onClick?: Handler<(event: MouseEvent, data: any) => boolean>;
+
+  /**
    * Called after the `commands.deleteFile` has been called.
    */
   onDeleteFile?: Handler<(props: { tr: Transaction; pos: number; node: ProsemirrorNode }) => void>;
@@ -49,7 +56,8 @@ export interface NoteOptions {
     render: NoteComponent,
     pasteRuleRegexp: /^((?!image).)*$/i,
   },
-  handlerKeys: ['onDeleteFile'],
+  handlerKeyOptions: { onClick: { earlyReturnValue: true } },
+  handlerKeys: ['onDeleteFile', 'onClick'],
 })
 export class NoteExtension extends NodeExtension<NoteOptions> {
   get name() {
@@ -141,6 +149,40 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         }
 
         return ['div', attrs];
+      },
+    };
+  }
+
+  // createPasteRules(): PasteRule[] {
+  //   return [
+  //     {
+  //       type: 'node',
+  //       nodeType: this.type,
+  //       regexp: this.options.pasteRuleRegexp
+  //     },
+  //   ];
+  // }
+
+  /**
+   * Track click events passed through to the editor.
+   */
+  createEventHandlers(): CreateEventHandlers {
+    return {
+      click: (event, clickState) => {
+        // Check if this is a direct click which must be the case for atom
+        // nodes.
+        if (!clickState.direct) {
+          return;
+        }
+
+        const nodeWithPosition = clickState.getNode(this.type);
+        const data = nodeWithPosition?.node.attrs;
+
+        if (!nodeWithPosition) {
+          return;
+        }
+
+        return this.options.onClick(event, data);
       },
     };
   }
