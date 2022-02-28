@@ -175,6 +175,13 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           return;
         }
 
+        // check if clicked on more options button
+        const target = event.target as HTMLElement;
+        const moreOptionsButton = target.closest('.more-options-container');
+        if (moreOptionsButton) {
+          return;
+        }
+
         const nodeWithPosition = clickState.getNode(this.type);
         const data = nodeWithPosition?.node.attrs;
 
@@ -205,7 +212,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       const node = state.doc.nodeAt(pos);
 
       if (node && node.type === this.type) {
-        tr.delete(pos, pos + 1).scrollIntoView();
+        tr.delete(pos, pos + 1);
         this.options.onDeleteFile({ tr, pos, node });
         dispatch?.(tr);
         return true;
