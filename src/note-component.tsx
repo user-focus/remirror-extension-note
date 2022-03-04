@@ -137,9 +137,8 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
           </div>
         </>
       ) : (
-        <p>Loading...</p>
+        <p className="loading-message">Loading...</p>
       )}
-
     </div >
   );
 };
