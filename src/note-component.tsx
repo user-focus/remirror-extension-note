@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { UploadContext } from "@remirror/core";
 import { NodeViewComponentProps, useCommands } from "@remirror/react";
 
 import type { NoteAttributes } from "./note-extension";
+import { parseTime } from './parseTime';
 
 export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
@@ -44,11 +45,12 @@ const DeleteIcon = () => {
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
   const attrs = node.attrs as NoteAttributes;
-  const { labels, title, description, createdBy, createdAt, interviewName } = attrs;
+  const { noteUrl = '' } = attrs;
   const { deleteFile } = useCommands();
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
+  const [noteDetails, setNoteDetails] = useState<any>({});
 
   const deleteNote = () => {
     deleteFile(position());
@@ -64,6 +66,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
         // inside click
         return;
       }
+
       setShowDropdown(false);
     };
 
@@ -78,42 +81,65 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
     };
   }, [showDropdown]);
 
+  const getNoteDetails = useCallback(async () => {
+    // get note details
+    try {
+      const response = await fetch(noteUrl.replace('event', 'notes'));
+      const data: any[] = await response.json();
+      console.log('data', data);
+      setNoteDetails(data[0]);
+    } catch (error) {
+      console.error('Error while fetching note details', error);
+    }
+  }, [noteUrl]);
+
+  useEffect(() => {
+    getNoteDetails();
+  }, [getNoteDetails]);
+
   return (
     <div className="NOTE_ROOT">
-      <div className="NOTE_LABELS_CONTAINER">
-        {labels && Array.isArray(labels) && labels.map((label) => (
-          <div className="NOTE_LABEL" key={label.id}>
-            {label.parent && label.parent.length > 0 && label.parent.map((parent: any) => (
-              <span key={parent.id}>{`${parent.text}`}<LabelSeperator /></span>
+      {Object.keys(noteDetails).length > 0 ? (
+        <>
+          <div className="NOTE_LABELS_CONTAINER">
+            {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
+              <div className="NOTE_LABEL" key={label.id}>
+                {label.parent && label.parent.length > 0 && label.parent.map((parent: any) => (
+                  <span key={parent.id}>{`${parent.text}`}<LabelSeperator /></span>
+                ))}
+                {label.text}
+              </div>
             ))}
-            {label.text}
           </div>
-        ))}
-      </div>
-      {title && title.length > 0 && (
-        <p className="NOTE_TITLE">{title}</p>
-      )}
-      {description && description.length > 0 && (
-        <p className="NOTE_DESCRIPTION">{description}</p>
+          {noteDetails.title && noteDetails.title.length > 0 && (
+            <p className="NOTE_TITLE">{noteDetails.title}</p>
+          )}
+          {noteDetails.comment && noteDetails.comment.length > 0 && (
+            <p className="NOTE_DESCRIPTION">{noteDetails.comment}</p>
+          )}
+
+          <div className="NOTE_FOOTER_WRAPPER">
+            <div>
+              <p className="NOTE_CREATED_BY">{noteDetails?.created_by?.first_name}</p>
+              <div className="bullet"> </div>
+              <p className="NOTE_CREATED_AT">{parseTime(noteDetails.created_at)}</p>
+              <div className="bullet"> </div>
+              <p className="NOTE_INTERVIEW_NAME">Source: {noteDetails.interview.name}</p>
+            </div>
+            <div ref={menuContainer} className="more-options-container">
+              <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
+              {showDropdown && (
+                <div className="dropdown-content">
+                  <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        <p>Loading...</p>
       )}
 
-      <div className="NOTE_FOOTER_WRAPPER">
-        <div>
-          <p className="NOTE_CREATED_BY">{createdBy}</p>
-          <div className="bullet"> </div>
-          <p className="NOTE_CREATED_AT">{createdAt}</p>
-          <div className="bullet"> </div>
-          <p className="NOTE_INTERVIEW_NAME">Source: {interviewName}</p>
-        </div>
-        <div ref={menuContainer} className="more-options-container">
-          <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
-          {showDropdown && (
-            <div className="dropdown-content">
-              <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
-            </div>
-          )}
-        </div>
-      </div>
     </div >
   );
 };
