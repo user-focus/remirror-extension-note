@@ -86,8 +86,11 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
     try {
       const response = await fetch(noteUrl.replace('event', 'notes'));
       const data: any[] = await response.json();
-      console.log('data', data);
-      setNoteDetails(data[0]);
+      if (Array.isArray(data) && data.length > 0) {
+        setNoteDetails(data[0]);
+      } else {
+        deleteNote();
+      }
     } catch (error) {
       console.error('Error while fetching note details', error);
     }
@@ -137,7 +140,11 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
           </div>
         </>
       ) : (
-        <p className="loading-message">Loading...</p>
+        <>
+          <p className="shimmer loading-message"></p>
+          <p className="shimmer loading-message"></p>
+          <p className="shimmer loading-message loading-message-half"></p>
+        </>
       )}
     </div >
   );
