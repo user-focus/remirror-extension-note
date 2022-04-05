@@ -178,7 +178,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         // check if clicked on more options button
         const target = event.target as HTMLElement;
         const moreOptionsButton = target.closest('.more-options-container');
-        if (moreOptionsButton) {
+        const createClusterButton = target.closest('.create-cluster-button');
+        if (moreOptionsButton || createClusterButton) {
           return;
         }
 
