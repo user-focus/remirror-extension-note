@@ -4,6 +4,7 @@ import { NodeViewComponentProps, useCommands } from "@remirror/react";
 
 import type { NoteAttributes } from "./note-extension";
 import { parseTime } from './parseTime';
+import Tippy from '@tippyjs/react';
 
 export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
@@ -42,6 +43,32 @@ const DeleteIcon = () => {
   )
 }
 
+const ClusterIcon = () => {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect y="0.5" width="14" height="13" rx="1" fill="#515867" />
+      <rect x="1" y="3.5" width="12" height="1.5" fill="white" />
+      <rect x="1" y="8.5" width="12" height="1.5" fill="white" />
+      <rect x="1" y="6" width="12" height="1.5" fill="white" />
+      <rect x="1" y="11" width="12" height="1.5" fill="white" />
+    </svg>
+  )
+};
+
+const ClusterButton = (props: { position: any; }) => {
+  const { toggleCallout } = useCommands();
+  const { position } = props;
+
+  const createCluster = () => {
+    toggleCallout({ type: 'blank' });
+  };
+
+  return (
+    <Tippy content="Make cluster">
+      <button className="create-cluster-button" onClick={createCluster}><ClusterIcon /></button>
+    </Tippy>
+  )
+}
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
   const attrs = node.attrs as NoteAttributes;
@@ -104,6 +131,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
     <div className="NOTE_ROOT">
       {Object.keys(noteDetails).length > 0 ? (
         <>
+          <ClusterButton position={position} />
           <div className="NOTE_LABELS_CONTAINER">
             {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
               <div className="NOTE_LABEL" key={label.id}>
