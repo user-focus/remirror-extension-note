@@ -55,11 +55,11 @@ const ClusterIcon = () => {
   )
 };
 
-const ClusterButton = (props: { position: any; }) => {
+const ClusterButton = () => {
   const { toggleCallout } = useCommands();
-  const { position } = props;
 
   const createCluster = () => {
+    // focus(position());
     toggleCallout({ type: 'blank' });
   };
 
@@ -131,7 +131,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
     <div className="NOTE_ROOT">
       {Object.keys(noteDetails).length > 0 ? (
         <>
-          <ClusterButton position={position} />
+          <ClusterButton />
           <div className="NOTE_LABELS_CONTAINER">
             {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
               <div className="NOTE_LABEL" key={label.id}>
