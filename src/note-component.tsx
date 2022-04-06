@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { UploadContext } from "@remirror/core";
-import { NodeViewComponentProps, useCommands } from "@remirror/react";
+import { NodeViewComponentProps, useCommands, useChainedCommands } from "@remirror/react";
 
 import type { NoteAttributes } from "./note-extension";
 import { parseTime } from './parseTime';
@@ -56,12 +56,11 @@ const ClusterIcon = () => {
 };
 
 const ClusterButton = (props: { position: any; }) => {
-  const { toggleCallout, focus } = useCommands();
+  const chain = useChainedCommands();
   const { position } = props;
 
   const createCluster = () => {
-    focus(position());
-    toggleCallout({ type: 'blank' });
+    chain.focus(position()).toggleCallout({ type: 'blank' }).run();
   };
 
   return (
