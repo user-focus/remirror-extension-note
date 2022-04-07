@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { UploadContext } from "@remirror/core";
-import { NodeViewComponentProps, useCommands } from "@remirror/react";
+import { NodeViewComponentProps, useCommands, useChainedCommands } from "@remirror/react";
 
 import type { NoteAttributes } from "./note-extension";
 import { parseTime } from './parseTime';
+import Tippy from '@tippyjs/react';
 
 export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
@@ -42,6 +43,42 @@ const DeleteIcon = () => {
   )
 }
 
+const ClusterIcon = () => {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="14" height="14" rx="1" fill="#515867" />
+      <rect x="1" y="3.22852" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="8.61328" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="5.91992" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="11.3047" width="12" height="1.61538" fill="white" />
+    </svg>
+  )
+};
+
+const DEFAULT_CLUSTER_TITLE = 'Untitled cluster';
+
+const ClusterButton = (props: { position: () => number; }) => {
+  const chain = useChainedCommands();
+  const { position } = props;
+
+  const createCluster = () => {
+    chain
+      .focus(position()) // focus on the note
+      .toggleCallout({ type: 'blank' }) // add the note to the callout
+      .insertText(DEFAULT_CLUSTER_TITLE) // insert the title
+      .selectText({
+        from: position() + 1,
+        to: position() + DEFAULT_CLUSTER_TITLE.length + 2
+      }) // select the title
+      .run();
+  };
+
+  return (
+    <Tippy content="Make cluster">
+      <button className="create-cluster-button" onClick={createCluster}><ClusterIcon /></button>
+    </Tippy>
+  )
+}
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
   const attrs = node.attrs as NoteAttributes;
@@ -104,6 +141,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
     <div className="NOTE_ROOT">
       {Object.keys(noteDetails).length > 0 ? (
         <>
+          <ClusterButton position={position} />
           <div className="NOTE_LABELS_CONTAINER">
             {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
               <div className="NOTE_LABEL" key={label.id}>
