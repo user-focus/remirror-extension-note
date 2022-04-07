@@ -46,21 +46,31 @@ const DeleteIcon = () => {
 const ClusterIcon = () => {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect y="0.5" width="14" height="13" rx="1" fill="#515867" />
-      <rect x="1" y="3.5" width="12" height="1.5" fill="white" />
-      <rect x="1" y="8.5" width="12" height="1.5" fill="white" />
-      <rect x="1" y="6" width="12" height="1.5" fill="white" />
-      <rect x="1" y="11" width="12" height="1.5" fill="white" />
+      <rect width="14" height="14" rx="1" fill="#515867" />
+      <rect x="1" y="3.22852" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="8.61328" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="5.91992" width="12" height="1.61538" fill="white" />
+      <rect x="1" y="11.3047" width="12" height="1.61538" fill="white" />
     </svg>
   )
 };
 
-const ClusterButton = (props: { position: any; }) => {
+const DEFAULT_CLUSTER_TITLE = 'Untitled cluster';
+
+const ClusterButton = (props: { position: () => number; }) => {
   const chain = useChainedCommands();
   const { position } = props;
 
   const createCluster = () => {
-    chain.focus(position()).toggleCallout({ type: 'blank' }).run();
+    chain
+      .focus(position()) // focus on the note
+      .toggleCallout({ type: 'blank' }) // add the note to the callout
+      .insertText(DEFAULT_CLUSTER_TITLE) // insert the title
+      .selectText({
+        from: position() + 1,
+        to: position() + DEFAULT_CLUSTER_TITLE.length + 2
+      }) // select the title
+      .run();
   };
 
   return (
