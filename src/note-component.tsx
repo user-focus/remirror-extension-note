@@ -70,6 +70,28 @@ const ClusterButton = (props: { position: any; }) => {
   )
 }
 
+// const quoteString = `<blockquote style=""><p style="">Voluptatem Est velit nisi nostrud temporibus incidunt iure earum dolore autd</p><p style=""><br class="ProseMirror-trailingBreak"></p><p style="">Santosh Viswanatham - <a href="//www.google.com" rel="noopener noreferrer nofollow" data-link-auto="">www.google.com</a></p></blockquote>`;
+// const quoteString = `<p>Hello world</p>`;
+const ConvertToQuoteButton = (props: { position: any; }) => {
+  // const chain = useChainedCommands();
+  const { convertToQuote } = useCommands();
+  const { position } = props;
+  console.log(position());
+  const handleConvertToQuote = () => {
+    // chain.insertNode(quoteString, {
+    //   range: {
+    //     from: position(),
+    //     to: position() + 1
+    //   }
+    // }).run();
+    // chain.insertNode(quoteString).run();
+    convertToQuote();
+  }
+  return (
+    <button className="convert-to-quote-button" onClick={handleConvertToQuote}><DeleteIcon />Convert to quote</button>
+  )
+}
+
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
   const attrs = node.attrs as NoteAttributes;
   const { noteUrl = '' } = attrs;
@@ -162,6 +184,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
               {showDropdown && (
                 <div className="dropdown-content">
                   <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
+                  <ConvertToQuoteButton position={position} />
                 </div>
               )}
             </div>

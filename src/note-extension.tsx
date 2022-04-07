@@ -19,6 +19,7 @@ import {
   PrimitiveSelection,
   ProsemirrorNode,
   Transaction,
+  htmlToProsemirrorNode,
 } from '@remirror/core';
 import { NodeViewComponentProps } from '@remirror/react';
 // import { PasteRule } from '@remirror/pm/paste-rules';
@@ -220,6 +221,20 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       }
 
       return false;
+    };
+  }
+
+  @command()
+  convertToQuote(selection?: PrimitiveSelection): CommandFunction {
+    return ({ tr, dispatch, state }) => {
+      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc);
+
+      const node = htmlToProsemirrorNode({
+        content: `<blockquote style=""><p style="">Voluptatem Est velit nisi nostrud temporibus incidunt iure earum dolore autd</p><p style=""><br class="ProseMirror-trailingBreak"></p><p style="">Santosh Viswanatham - <a href="//www.google.com" rel="noopener noreferrer nofollow" data-link-auto="">www.google.com</a></p></blockquote>`,
+        schema: state.schema,
+      });
+      dispatch?.(tr.replaceRangeWith(from, to, node));
+      return true;
     };
   }
 
