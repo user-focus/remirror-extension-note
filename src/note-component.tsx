@@ -55,7 +55,7 @@ const ClusterIcon = () => {
   )
 };
 
-const DEFAULT_CLUSTER_TITLE = 'Untitled cluster'
+const DEFAULT_CLUSTER_TITLE = 'Untitled cluster';
 
 const ClusterButton = (props: { position: () => number; }) => {
   const chain = useChainedCommands();
