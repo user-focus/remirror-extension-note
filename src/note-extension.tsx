@@ -225,12 +225,16 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   }
 
   @command()
-  convertToQuote(selection?: PrimitiveSelection): CommandFunction {
+  convertToQuote(attributes: NoteAttributes, selection?: PrimitiveSelection): CommandFunction {
     return ({ tr, dispatch, state }) => {
       const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc);
+      const { id, subtitle, interviewName, noteUrl } = attributes;
 
       const node = htmlToProsemirrorNode({
-        content: `<blockquote style=""><p style="">Voluptatem Est velit nisi nostrud temporibus incidunt iure earum dolore autd</p><p style=""><br class="ProseMirror-trailingBreak"></p><p style="">Santosh Viswanatham - <a href="//www.google.com" rel="noopener noreferrer nofollow" data-link-auto="">www.google.com</a></p></blockquote>`,
+        content: `<blockquote class="note-quote" id="note-quote-${id}">
+          <p class="subtitle">${subtitle}</p>
+          <p class="interview-name">Source: ${interviewName} - <a href="${noteUrl}" rel="noopener noreferrer nofollow" data-link-auto="">Open note</a></p>
+        </blockquote>`,
         schema: state.schema,
       });
       dispatch?.(tr.replaceRangeWith(from, to, node));
@@ -305,6 +309,8 @@ export interface NoteAttributes {
   createdBy?: string;
 
   labels?: any[];
+
+  subtitle?: string;
 
   /**
    * URL where the note can be viewed

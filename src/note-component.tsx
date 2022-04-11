@@ -6,6 +6,8 @@ import type { NoteAttributes } from "./note-extension";
 import { parseTime } from './parseTime';
 import Tippy from '@tippyjs/react';
 
+import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./icons";
+
 export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
   abort: () => void;
@@ -18,42 +20,6 @@ const LabelSeperator = () => {
     </svg>
   )
 }
-
-const MoreOptionsIcon = () => {
-  return (
-    <svg width="3" height="15" viewBox="0 0 3 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="1.5" cy="1.5" r="1.5" fill="#8C95A8" />
-      <circle cx="1.5" cy="7.5" r="1.5" fill="#8C95A8" />
-      <circle cx="1.5" cy="13.5" r="1.5" fill="#8C95A8" />
-    </svg>
-  );
-}
-
-const DeleteIcon = () => {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1.40541" y="5.40541" width="16.1004" height="11.063" rx="0.970516" stroke="#FB3569" strokeWidth="0.810811" />
-      <rect x="4.59827" y="8.23828" width="9.71493" height="0.848129" rx="0.424064" fill="#FB3569" />
-      <rect x="4.59827" y="10.3975" width="9.71493" height="0.848129" rx="0.424064" fill="#FB3569" />
-      <rect x="4.59827" y="12.5557" width="9.71493" height="0.848129" rx="0.424064" fill="#FB3569" />
-      <circle cx="16" cy="14" r="7" fill="white" />
-      <circle cx="16.0885" cy="13.9052" r="4.68337" fill="#FB3569" stroke="#FB3569" strokeWidth="0.810811" />
-      <path d="M14.0947 11.7852L16.215 13.9055M16.215 13.9055L18.3354 16.0258M16.215 13.9055L18.3354 11.7852M16.215 13.9055L14.0947 16.0258" stroke="white" strokeWidth="0.810811" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-const ClusterIcon = () => {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="14" height="14" rx="1" fill="#515867" />
-      <rect x="1" y="3.22852" width="12" height="1.61538" fill="white" />
-      <rect x="1" y="8.61328" width="12" height="1.61538" fill="white" />
-      <rect x="1" y="5.91992" width="12" height="1.61538" fill="white" />
-      <rect x="1" y="11.3047" width="12" height="1.61538" fill="white" />
-    </svg>
-  )
-};
 
 const DEFAULT_CLUSTER_TITLE = 'Untitled cluster';
 
@@ -82,23 +48,21 @@ const ClusterButton = (props: { position: () => number; }) => {
 
 // const quoteString = `<blockquote style=""><p style="">Voluptatem Est velit nisi nostrud temporibus incidunt iure earum dolore autd</p><p style=""><br class="ProseMirror-trailingBreak"></p><p style="">Santosh Viswanatham - <a href="//www.google.com" rel="noopener noreferrer nofollow" data-link-auto="">www.google.com</a></p></blockquote>`;
 // const quoteString = `<p>Hello world</p>`;
-const ConvertToQuoteButton = (props: { position: any; }) => {
+const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl: string; subtitle: string; interviewName: string; }) => {
   // const chain = useChainedCommands();
   const { convertToQuote } = useCommands();
-  const { position } = props;
+  const { position, id, noteUrl, subtitle, interviewName } = props;
   console.log(position());
   const handleConvertToQuote = () => {
-    // chain.insertNode(quoteString, {
-    //   range: {
-    //     from: position(),
-    //     to: position() + 1
-    //   }
-    // }).run();
-    // chain.insertNode(quoteString).run();
-    convertToQuote();
+    convertToQuote({
+      id,
+      subtitle: subtitle || 'Transcription unavailable.',
+      interviewName,
+      noteUrl
+    });
   }
   return (
-    <button className="convert-to-quote-button" onClick={handleConvertToQuote}><DeleteIcon />Convert to quote</button>
+    <button className="convert-to-quote-button" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
   )
 }
 
@@ -193,8 +157,13 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
               <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
               {showDropdown && (
                 <div className="dropdown-content">
+                  <ConvertToQuoteButton
+                    position={position}
+                    id={noteDetails.id}
+                    subtitle={noteDetails.subtitle}
+                    interviewName={noteDetails.interview.name}
+                    noteUrl={noteUrl} />
                   <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
-                  <ConvertToQuoteButton position={position} />
                 </div>
               )}
             </div>
