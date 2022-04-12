@@ -62,7 +62,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
     }, position());
   }
   return (
-    <button className="convert-to-quote-button" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
+    <button className="convert-to-quote-button no-hover" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
   )
 }
 

@@ -30,8 +30,8 @@ export const ConvertToQuoteIcon = () => {
         fill="#515867"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M3 9H2V16C2 17.1046 2.89543 18 4 18H13V17H4C3.44772 17 3 16.5523 3 16V9ZM9 4V5H18C18.5523 5 19 5.44772 19 6V13H20V6C20 4.89543 19.1046 4 18 4H9Z"
         fill="#515867"
       />
