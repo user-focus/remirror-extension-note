@@ -59,7 +59,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
       subtitle: subtitle || 'Transcription unavailable.',
       interviewName,
       noteUrl
-    });
+    }, position());
   }
   return (
     <button className="convert-to-quote-button" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
