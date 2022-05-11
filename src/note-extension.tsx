@@ -233,7 +233,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       const node = htmlToProsemirrorNode({
         content: `<blockquote class="note-quote" id="note-quote-${id}">
           <p class="subtitle">${subtitle}</p>
-          <p class="interview-name">Source: ${interviewName} - <a href="${noteUrl}" data-note-id="${id}" rel="noopener noreferrer nofollow" data-link-auto="">Open note</a></p>
+          <p class="interview-source">Source: ${interviewName} - <a href="${noteUrl}" data-note-id="${id}" rel="noopener noreferrer nofollow" data-link-auto="">Open note</a></p>
         </blockquote>`,
         schema: state.schema,
       });

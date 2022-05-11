@@ -46,20 +46,20 @@ const ClusterButton = (props: { position: () => number; }) => {
   )
 }
 
-// const quoteString = `<blockquote style=""><p style="">Voluptatem Est velit nisi nostrud temporibus incidunt iure earum dolore autd</p><p style=""><br class="ProseMirror-trailingBreak"></p><p style="">Santosh Viswanatham - <a href="//www.google.com" rel="noopener noreferrer nofollow" data-link-auto="">www.google.com</a></p></blockquote>`;
-// const quoteString = `<p>Hello world</p>`;
 const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl: string; subtitle: string; interviewName: string; }) => {
-  // const chain = useChainedCommands();
-  const { convertToQuote } = useCommands();
+  const chain = useChainedCommands();
   const { position, id, noteUrl, subtitle, interviewName } = props;
-  console.log(position());
   const handleConvertToQuote = () => {
-    convertToQuote({
-      id,
-      subtitle: subtitle || 'Transcription unavailable.',
-      interviewName,
-      noteUrl
-    }, position());
+    const subtitleText = subtitle || 'Transcription unavailable.';
+    chain
+      .convertToQuote({
+        id,
+        subtitle: subtitleText,
+        interviewName,
+        noteUrl
+      }, position())
+      .focus(position() + subtitleText.length + 2) // focus at end of quote
+      .run();
   }
   return (
     <button className="convert-to-quote-button no-hover" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
