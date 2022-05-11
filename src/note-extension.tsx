@@ -19,6 +19,7 @@ import {
   PrimitiveSelection,
   ProsemirrorNode,
   Transaction,
+  htmlToProsemirrorNode,
 } from '@remirror/core';
 import { NodeViewComponentProps } from '@remirror/react';
 // import { PasteRule } from '@remirror/pm/paste-rules';
@@ -223,6 +224,24 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
     };
   }
 
+  @command()
+  convertToQuote(attributes: NoteAttributes, selection?: PrimitiveSelection): CommandFunction {
+    return ({ tr, dispatch, state }) => {
+      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc);
+      const { id, subtitle, interviewName, noteUrl } = attributes;
+
+      const node = htmlToProsemirrorNode({
+        content: `<blockquote class="note-quote" id="note-quote-${id}">
+          <p class="subtitle">${subtitle}</p>
+          <p class="interview-source">Source: ${interviewName} - <a href="${noteUrl}" data-note-id="${id}" rel="noopener noreferrer nofollow" data-link-auto="">Open note</a></p>
+        </blockquote>`,
+        schema: state.schema,
+      });
+      dispatch?.(tr.replaceRangeWith(from, to, node));
+      return true;
+    };
+  }
+
   @keyBinding({ shortcut: ['Backspace', 'Delete'] })
   backspaceShortcut(props: KeyBindingProps): boolean {
     const { tr, state } = props;
@@ -290,6 +309,8 @@ export interface NoteAttributes {
   createdBy?: string;
 
   labels?: any[];
+
+  subtitle?: string;
 
   /**
    * URL where the note can be viewed
