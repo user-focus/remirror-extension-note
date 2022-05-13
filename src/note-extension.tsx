@@ -26,6 +26,8 @@ import { NodeViewComponentProps } from '@remirror/react';
 import type { CreateEventHandlers } from '@remirror/extension-events';
 
 import { NoteComponent, NoteComponentProps } from './note-component';
+import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
+import { INote } from './utils/typings';
 
 export interface NoteOptions {
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
@@ -88,6 +90,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         labels: { default: [] },
         noteUrl: { default: '' },
         error: { default: null },
+        subtitle: { default: '' },
       },
       selectable: true,
       draggable: true,
@@ -223,6 +226,23 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       return false;
     };
   }
+
+  @command()
+  updateNote(pos: number, newNoteObject: INote): CommandFunction {
+    return ({ tr, state, dispatch }) => {
+      const node = state.doc.nodeAt(pos);
+
+      if (node && node.type === this.type) {
+        const newAttributes = getNoteExtensionObject(newNoteObject, node.attrs);
+        if (!newAttributes) return false;
+        tr.setNodeMarkup(pos, node.type, newAttributes);
+        if (dispatch) dispatch(tr);
+        return true;
+      }
+
+      return false;
+    };
+  };
 
   @command()
   convertToQuote(attributes: NoteAttributes, selection?: PrimitiveSelection): CommandFunction {
