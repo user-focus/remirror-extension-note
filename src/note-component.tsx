@@ -12,6 +12,7 @@ import { INote } from "./utils/typings";
 export type NoteComponentProps = NodeViewComponentProps & {
   context?: UploadContext;
   abort: () => void;
+  isEditable?: boolean;
 };
 
 const LabelSeperator = () => {
@@ -67,7 +68,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable }) => {
   const noteDetails = node.attrs as NoteAttributes;
   const { noteUrl = '' } = noteDetails;
   const { deleteFile, updateNote } = useCommands();
@@ -131,7 +132,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition 
   }, [getNoteDetails]);
 
   return (
-    <div className="NOTE_ROOT">
+    <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
       <ClusterButton position={position} />
       <div className="NOTE_LABELS_CONTAINER">
         {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (

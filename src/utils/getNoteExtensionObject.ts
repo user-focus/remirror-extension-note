@@ -2,6 +2,14 @@ import { INote } from "./typings";
 import { NoteAttributes } from "../note-extension";
 
 /* eslint-disable babel/camelcase */
+/**
+ * Get note object as expected by extension from
+ * the note object in db
+ * 
+ * @param updatedNoteObject - db note object
+ * @param previousNoteObject - previous attributes of the note object
+ * @returns 
+ */
 export const getNoteExtensionObject = (
   updatedNoteObject: INote,
   previousNoteObject: NoteAttributes = {}
