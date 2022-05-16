@@ -26,6 +26,8 @@ import { NodeViewComponentProps } from '@remirror/react';
 import type { CreateEventHandlers } from '@remirror/extension-events';
 
 import { NoteComponent, NoteComponentProps } from './note-component';
+import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
+import { INote } from './utils/typings';
 
 export interface NoteOptions {
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
@@ -47,6 +49,10 @@ export interface NoteOptions {
    * Called after the `commands.deleteFile` has been called.
    */
   onDeleteFile?: Handler<(props: { tr: Transaction; pos: number; node: ProsemirrorNode }) => void>;
+   /**
+   * Is the note editable
+   */
+  isEditable?: boolean
 }
 
 /**
@@ -55,6 +61,7 @@ export interface NoteOptions {
 @extension<NoteOptions>({
   defaultOptions: {
     render: NoteComponent,
+    isEditable: false,
     pasteRuleRegexp: /^((?!image).)*$/i,
   },
   handlerKeyOptions: { onClick: { earlyReturnValue: true } },
@@ -66,7 +73,12 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   }
 
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
-    return this.options.render({ ...props, abort: () => { }, context: undefined });
+    return this.options.render({
+      ...props,
+      abort: () => { },
+      context: undefined,
+      isEditable: this.options.isEditable,
+    });
   };
 
   createTags() {
@@ -88,9 +100,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         labels: { default: [] },
         noteUrl: { default: '' },
         error: { default: null },
+        subtitle: { default: '' },
       },
       selectable: true,
-      draggable: true,
+      draggable: this.options.isEditable,
       atom: true,
       content: '',
       ...override,
@@ -223,6 +236,23 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       return false;
     };
   }
+
+  @command()
+  updateNote(pos: number, newNoteObject: INote): CommandFunction {
+    return ({ tr, state, dispatch }) => {
+      const node = state.doc.nodeAt(pos);
+
+      if (node && node.type === this.type) {
+        const newAttributes = getNoteExtensionObject(newNoteObject, node.attrs);
+        if (!newAttributes) return false;
+        tr.setNodeMarkup(pos, node.type, newAttributes);
+        if (dispatch) dispatch(tr);
+        return true;
+      }
+
+      return false;
+    };
+  };
 
   @command()
   convertToQuote(attributes: NoteAttributes, selection?: PrimitiveSelection): CommandFunction {
