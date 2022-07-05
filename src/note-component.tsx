@@ -42,8 +42,10 @@ const ClusterButton = (props: { position: () => number; }) => {
   };
 
   return (
-    <Tippy content="Make cluster">
-      <button className="create-cluster-button" onClick={createCluster}><ClusterIcon /></button>
+    <Tippy placement="bottom" content="Make cluster">
+      <button className="more-options-button create-cluster-button" onClick={createCluster}>
+        <ClusterIcon />
+      </button>
     </Tippy>
   )
 }
@@ -64,7 +66,11 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
       .run();
   }
   return (
-    <button className="convert-to-quote-button no-hover" onClick={handleConvertToQuote}><ConvertToQuoteIcon />Convert note’s transcript to quote</button>
+    <Tippy placement="bottom" content={"Convert note’s transcript to quote"}>
+      <button className="more-options-button convert-to-quote-button" onClick={handleConvertToQuote}>
+        <ConvertToQuoteIcon />
+      </button>
+    </Tippy>
   )
 }
 
@@ -133,7 +139,6 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
 
   return (
     <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
-      <ClusterButton position={position} />
       <div className="NOTE_LABELS_CONTAINER">
         {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
           <div className="NOTE_LABEL" key={label.id}>
@@ -160,15 +165,16 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
           <p className="NOTE_INTERVIEW_NAME">Source: {noteDetails.interviewName}</p>
         </div>
         <div ref={menuContainer} className="more-options-container">
+          <ClusterButton position={position} />
+          <ConvertToQuoteButton
+            position={position}
+            id={noteDetails.id}
+            subtitle={noteDetails.subtitle}
+            interviewName={noteDetails.interviewName}
+            noteUrl={noteUrl} />
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
-              <ConvertToQuoteButton
-                position={position}
-                id={noteDetails.id}
-                subtitle={noteDetails.subtitle}
-                interviewName={noteDetails.interviewName}
-                noteUrl={noteUrl} />
               <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
             </div>
           )}
