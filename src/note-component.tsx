@@ -66,7 +66,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
       .run();
   }
   return (
-    <Tippy placement="bottom" content={"Convert note’s transcript to quote"}>
+    <Tippy placement="bottom" content="Convert note’s transcript to quote">
       <button className="more-options-button convert-to-quote-button" onClick={handleConvertToQuote}>
         <ConvertToQuoteIcon />
       </button>
