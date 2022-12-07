@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import React, { ComponentType } from 'react';
 import {
   ApplySchemaAttributes,
   command,
@@ -25,11 +25,20 @@ import { NodeViewComponentProps } from '@remirror/react';
 // import { PasteRule } from '@remirror/pm/paste-rules';
 import type { CreateEventHandlers } from '@remirror/extension-events';
 
-import { NoteComponent, NoteComponentProps } from './note-component';
+import { NoteComponentProps } from './note-component';
 import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
 import { INote } from './utils/typings';
+import { VariantRenderer } from './variant-renderer';
 
 export interface NoteOptions {
+  /**
+   * variants - an object of variants to render
+   * @default {}
+   * @remarks
+   * This is an object of variants to render. The key is the variant name, and the value is a React component.
+   * The component will receive the following props:
+   **/
+  variantComponents?: Record<string, ComponentType<NoteComponentProps>>;
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   /**
@@ -60,12 +69,15 @@ export interface NoteOptions {
  */
 @extension<NoteOptions>({
   defaultOptions: {
-    render: NoteComponent,
+    variantComponents: {},
+    render: VariantRenderer,
     isEditable: false,
     pasteRuleRegexp: /^((?!image).)*$/i,
   },
   handlerKeyOptions: { onClick: { earlyReturnValue: true } },
   handlerKeys: ['onDeleteFile', 'onClick'],
+  staticKeys:[],
+  customHandlerKeys: [],
 })
 export class NoteExtension extends NodeExtension<NoteOptions> {
   get name() {
@@ -75,6 +87,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
     return this.options.render({
       ...props,
+      variantComponents: this.options.variantComponents,
       abort: () => { },
       context: undefined,
       isEditable: this.options.isEditable,
@@ -101,6 +114,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         noteUrl: { default: '' },
         error: { default: null },
         subtitle: { default: '' },
+        variant: { default: 'default' },
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -123,7 +137,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const createdAt = anchor.getAttribute('data-created-at');
             const labels = JSON.parse(anchor.getAttribute('data-labels') ?? '[]');
             const noteUrl = anchor.getAttribute('data-note-url');
-
+            const variant = anchor.getAttribute('data-variant');
             return {
               ...extra.parse(dom),
               id,
@@ -136,6 +150,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               createdAt,
               labels,
               noteUrl,
+              variant,
             };
           },
         },
@@ -156,6 +171,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-created-at': node.attrs.createdAt,
           'data-labels': JSON.stringify(node.attrs.labels),
           'data-note-url': node.attrs.noteUrl,
+          'data-variant': node.attrs.variant,
         };
 
         if (error) {
@@ -354,6 +370,14 @@ export interface NoteAttributes {
    * Error state for the file, e.g. upload failed
    */
   error?: string | null;
+
+  /**
+   * Variant of the note, e.g. playlist, player, etc.
+   * @default 'default'
+   * @optional
+   * @example 'playlist'
+   */
+  variant?: string;
 }
 
 declare global {

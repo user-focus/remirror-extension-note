@@ -10,6 +10,7 @@ import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./
 import { INote } from "./utils/typings";
 
 export type NoteComponentProps = NodeViewComponentProps & {
+  variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
   context?: UploadContext;
   abort: () => void;
   isEditable?: boolean;
