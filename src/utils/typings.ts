@@ -42,6 +42,10 @@ export interface INote {
    * Transcription subtitle
    */
   subtitle: string;
+  /**
+   * Variant of the note
+   */
+  variant?: string;
 }
 
 /**

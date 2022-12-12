@@ -39,6 +39,7 @@ export interface NoteOptions {
    * The component will receive the following props:
    **/
   variantComponents?: Record<string, ComponentType<NoteComponentProps>>;
+  variantDropdown?: ComponentType<NoteComponentProps> | null;
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   /**
@@ -70,6 +71,7 @@ export interface NoteOptions {
 @extension<NoteOptions>({
   defaultOptions: {
     variantComponents: {},
+    variantDropdown: null,
     render: VariantRenderer,
     isEditable: false,
     pasteRuleRegexp: /^((?!image).)*$/i,
@@ -87,6 +89,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
     return this.options.render({
       ...props,
+      variantDropdown: this.options.variantDropdown,
       variantComponents: this.options.variantComponents,
       abort: () => { },
       context: undefined,
@@ -260,6 +263,23 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
 
       if (node && node.type === this.type) {
         const newAttributes = getNoteExtensionObject(newNoteObject, node.attrs);
+        if (!newAttributes) return false;
+        tr.setNodeMarkup(pos, node.type, newAttributes);
+        if (dispatch) dispatch(tr);
+        return true;
+      }
+
+      return false;
+    };
+  };
+
+  @command()
+  updateVariant(pos: number, variant: string): CommandFunction {
+    return ({ tr, state, dispatch }) => {
+      const node = state.doc.nodeAt(pos);
+
+      if (node && node.type === this.type) {
+        const newAttributes = { ...node.attrs, variant };
         if (!newAttributes) return false;
         tr.setNodeMarkup(pos, node.type, newAttributes);
         if (dispatch) dispatch(tr);

@@ -27,6 +27,7 @@ export const getNoteExtensionObject = (
     end_time,
     start_time,
     subtitle,
+    variant,
   } = updatedNoteObject;
   if (
     typeof previousNoteObject === "object" &&
@@ -45,6 +46,7 @@ export const getNoteExtensionObject = (
       createdBy: createdBy?.first_name,
       labels,
       subtitle,
+      variant,
     };
   return null;
 };

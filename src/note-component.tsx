@@ -11,6 +11,7 @@ import { INote } from "./utils/typings";
 
 export type NoteComponentProps = NodeViewComponentProps & {
   variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
+  variantDropdown?: React.ComponentType<NoteComponentProps> | null;
   context?: UploadContext;
   abort: () => void;
   isEditable?: boolean;
@@ -75,10 +76,10 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable, variantDropdown }) => {
   const noteDetails = node.attrs as NoteAttributes;
   const { noteUrl = '' } = noteDetails;
-  const { deleteFile, updateNote } = useCommands();
+  const { deleteFile, updateNote, updateVariant } = useCommands();
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
@@ -134,6 +135,10 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     }
   }, [noteUrl]);
 
+  const changeToPlaylist = () => {
+    updateVariant(position(), 'playlist');
+  };
+
   useEffect(() => {
     getNoteDetails();
   }, [getNoteDetails]);
@@ -173,9 +178,11 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
             subtitle={noteDetails.subtitle}
             interviewName={noteDetails.interviewName}
             noteUrl={noteUrl} />
+          {variantDropdown}
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
+              <button className="delete-note-button" onClick={changeToPlaylist}><DeleteIcon />Change to Playlist</button>
               <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
             </div>
           )}
