@@ -7,14 +7,14 @@ import { parseTime } from './utils/parseTime';
 import Tippy from '@tippyjs/react';
 
 import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./icons";
-import { INote } from "./utils/typings";
 
 export type NoteComponentProps = NodeViewComponentProps & {
   variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
-  variantDropdown?: React.ComponentType<NoteComponentProps> | null;
+  VariantDropdown?:  any;
   context?: UploadContext;
   abort: () => void;
   isEditable?: boolean;
+  reportType?: string;
 };
 
 const LabelSeperator = () => {
@@ -76,10 +76,10 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable, variantDropdown }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable, VariantDropdown }) => {
   const noteDetails = node.attrs as NoteAttributes;
-  const { noteUrl = '' } = noteDetails;
-  const { deleteFile, updateNote, updateVariant } = useCommands();
+  const { noteUrl = ''} = noteDetails;
+  const { deleteFile, updateVariant } = useCommands();
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
@@ -87,13 +87,6 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const deleteNote = () => {
     deleteFile(position());
   };
-
-  const updateThisNote = useCallback(
-    (noteObject: INote) => {
-      updateNote(position(), noteObject);
-    },
-    [updateNote, position]
-  );
 
   const toggleDropdownMenu = () => {
     setShowDropdown(!showDropdown);
@@ -120,28 +113,9 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     };
   }, [showDropdown]);
 
-  const getNoteDetails = useCallback(async () => {
-    // get note details
-    try {
-      const response = await fetch(noteUrl.replace('event', 'notes'));
-      const data: any[] = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        updateThisNote(data[0]);
-      } else {
-        deleteNote();
-      }
-    } catch (error) {
-      console.error('Error while fetching note details', error);
-    }
-  }, [noteUrl]);
-
-  const changeToPlaylist = () => {
-    updateVariant(position(), 'playlist');
-  };
-
-  useEffect(() => {
-    getNoteDetails();
-  }, [getNoteDetails]);
+  const onVariantSelect = useCallback((variant: string) => {
+    updateVariant(position(), variant);
+  }, [updateVariant, position]);
 
   return (
     <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
@@ -178,11 +152,10 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
             subtitle={noteDetails.subtitle}
             interviewName={noteDetails.interviewName}
             noteUrl={noteUrl} />
-          {variantDropdown}
+          <VariantDropdown onVariantSelect={onVariantSelect}/>
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
-              <button className="delete-note-button" onClick={changeToPlaylist}><DeleteIcon />Change to Playlist</button>
               <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
             </div>
           )}
