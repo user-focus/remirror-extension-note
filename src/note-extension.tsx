@@ -133,6 +133,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         startTime: { default: null },
         endTime: { default: null },
         fileType: { default: null },
+        thumbnailUrl: { default: null },
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -161,6 +162,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const startTime = anchor.getAttribute('data-start-time');
             const endTime = anchor.getAttribute('data-end-time');
             const fileType = anchor.getAttribute('data-file-type');
+            const thumbnailUrl = anchor.getAttribute('data-thumbnail-url');
             return {
               ...extra.parse(dom),
               id,
@@ -179,6 +181,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               startTime,
               endTime,
               fileType,
+              thumbnailUrl,
             };
           },
         },
@@ -205,6 +208,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-start-time': node.attrs.startTime,
           'data-end-time': node.attrs.endTime,
           'data-file-type': node.attrs.fileType,
+          'data-thumbnail-url': node.attrs.thumbnailUrl,
         };
 
         if (error) {
@@ -454,6 +458,11 @@ export interface NoteAttributes {
    * File type
    **/
   fileType?: string;
+
+  /**
+   * Thumbnail URL
+   **/
+  thumbnailUrl?: string;
 }
 
 declare global {

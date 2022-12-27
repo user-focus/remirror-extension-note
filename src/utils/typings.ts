@@ -54,6 +54,11 @@ export interface INote {
    * Author of the note
    * */
   author: string;
+
+  /**
+   * Thumbnail url
+   * */
+  thumbnail_url: string;
 }
 
 /**
