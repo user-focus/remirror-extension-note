@@ -134,6 +134,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         endTime: { default: null },
         fileType: { default: null },
         thumbnailUrl: { default: null },
+        wavId: { default: null },
+        color: { default: '' },
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -163,6 +165,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const endTime = anchor.getAttribute('data-end-time');
             const fileType = anchor.getAttribute('data-file-type');
             const thumbnailUrl = anchor.getAttribute('data-thumbnail-url');
+            const wavId = anchor.getAttribute('data-wav-id');
+            const color = anchor.getAttribute('data-color');
             return {
               ...extra.parse(dom),
               id,
@@ -182,6 +186,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               endTime,
               fileType,
               thumbnailUrl,
+              wavId,
+              color,
             };
           },
         },
@@ -209,6 +215,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-end-time': node.attrs.endTime,
           'data-file-type': node.attrs.fileType,
           'data-thumbnail-url': node.attrs.thumbnailUrl,
+          'data-wav-id': node.attrs.wavId,
+          'data-color': node.attrs.color,
         };
 
         if (error) {
@@ -463,6 +471,16 @@ export interface NoteAttributes {
    * Thumbnail URL
    **/
   thumbnailUrl?: string;
+
+  /**
+   * Wav id
+   **/
+  wavId?: string;
+
+  /**
+   * color
+   **/
+  color?: string;
 }
 
 declare global {

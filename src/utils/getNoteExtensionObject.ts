@@ -28,7 +28,8 @@ export const getNoteExtensionObject = (
     subtitle,
     wav,
     author,
-    thumbnail_url
+    thumbnail_url,
+    color,
   } = updatedNoteObject;
   if (
     typeof previousNoteObject === "object" &&
@@ -52,7 +53,9 @@ export const getNoteExtensionObject = (
       interviewLength: wav?.interview_length,
       startTime: start_time,
       endTime: end_time,
-      thumbnailUrl: thumbnail_url
+      thumbnailUrl: thumbnail_url,
+      wavId: wav?.id,
+      color,
     };
   return null;
 };

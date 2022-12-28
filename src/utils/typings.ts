@@ -59,6 +59,11 @@ export interface INote {
    * Thumbnail url
    * */
   thumbnail_url: string;
+
+  /**
+   * Color of the note
+   * */
+  color: string;
 }
 
 /**
