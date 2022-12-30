@@ -44,7 +44,9 @@ const ClusterButton = (props: { position: () => number; }) => {
   };
 
   return (
-    <Tippy placement="bottom" content="Make cluster">
+    <Tippy  placement="bottom" content={
+      <span className="note-tooltip">Make cluster</span>
+    } >
       <button className="more-options-button create-cluster-button" onClick={createCluster}>
         <ClusterIcon />
       </button>
@@ -68,7 +70,9 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
       .run();
   }
   return (
-    <Tippy placement="bottom" content="Convert note’s transcript to quote">
+    <Tippy placement="bottom" content={
+      <span className="note-tooltip">Convert note’s transcript to quote</span>
+    } >
       <button className="more-options-button convert-to-quote-button" onClick={handleConvertToQuote}>
         <ConvertToQuoteIcon />
       </button>
