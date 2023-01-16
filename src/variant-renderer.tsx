@@ -1,6 +1,7 @@
 import { useCommands } from "@remirror/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { NoteComponent } from "./note-component";
+import { NotePastePrompt } from "./note-paste-prompt";
 import { getNoteKeyFromNoteUrl } from "./utils/getNoteKeyFromUrl";
 import { INote } from "./utils/typings";
 
@@ -18,7 +19,7 @@ export const VariantRenderer = ({
    
     const Component = variantComponents[variant] || NoteComponent;
 
-    const { deleteFile, updateNote, replaceNoteWithLink } = useCommands();
+    const { deleteFile, updateNote, replaceNoteWithLink, insertText } = useCommands();
 
     const getNoteDetails = useCallback(async (noteId?: string) => {
         // get note details
@@ -62,7 +63,7 @@ export const VariantRenderer = ({
             await getNoteDetails(noteId);
         } catch (err) {
             console.error("Error while fetching note detail", err);
-            replaceNoteWithLink(noteUrl, position());
+            replaceNoteWithLink(noteUrl, position(), insertText);
         }
     }, [noteUrl, getNoteDetails, replaceNoteWithLink, noteUrl]);
 
@@ -78,7 +79,7 @@ export const VariantRenderer = ({
     }, [deleteFile, position]);
 
     const handleRevertClick = useCallback(() => {
-        replaceNoteWithLink(noteUrl, position());
+        replaceNoteWithLink(noteUrl, position(), insertText);
     }, [replaceNoteWithLink, position]);
 
     const handleInsertNote = useCallback(() => {
@@ -92,17 +93,10 @@ export const VariantRenderer = ({
     }, [getNoteDetails, createNode]);
 
     return showLinkPrompt ? (
-        <div className="NOTE_LOADING_CONTAINER">
-            <div className="NOTE_REPLACE_INFO">
-                <a className="NOTE_INFO_LINK" href={noteUrl} rel="noopener noreferrer" target="_blank">
-                    {noteUrl}
-                </a>
-                <p>Looks like a link to a note. Do you want to insert a note ?</p>
-            </div>
-            <div className="NOTE_REPLACE_ACTIONS">
-                <button onClick={handleInsertNote} className="NOTE_REPLACE_PRIMARY">Yes</button>
-                <button onClick={handleRevertClick} className="NOTE_REPLACE_SECONDARY">No</button>
-            </div>
-        </div>
+        <NotePastePrompt
+            noteUrl={noteUrl}
+            handleInsertNote={handleInsertNote}
+            handleRevertClick={handleRevertClick}
+        />
     ) : <Component {...restProps} />;
 };

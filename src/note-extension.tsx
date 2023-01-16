@@ -290,11 +290,11 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   }
 
   @command()
-  replaceNoteWithLink(noteUrl: string, position: number): CommandFunction {
+  replaceNoteWithLink(noteUrl: string, position: number, insertText: (text: string | (() => Promise<string>), options?: any) => void): CommandFunction {
     return ({ tr, dispatch }) => {
       tr.delete(position, position + 1);
-      tr.insertText(noteUrl, position);
       dispatch?.(tr);
+      insertText(noteUrl, position);
       return true;
     };
   };
