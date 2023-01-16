@@ -29,6 +29,7 @@ import { NoteComponentProps } from './note-component';
 import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
 import { INote } from './utils/typings';
 import { VariantRenderer } from './variant-renderer';
+import { NodePasteRule } from '@remirror/pm/paste-rules';
 
 export type VariantDropdownProps = {
   onVariantSelect: (variant: string) => void;
@@ -46,6 +47,7 @@ export interface NoteOptions {
   VariantDropdown?: ComponentType<VariantDropdownProps> | null;
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
+  createNode?: boolean;
   /**
    * A regex test for the file type when users paste files.
    *
@@ -81,6 +83,7 @@ export interface NoteOptions {
     variantComponents: {},
     VariantDropdown: null,
     render: VariantRenderer,
+    createNode: false,
     isEditable: false,
     pasteRuleRegexp: /^((?!image).)*$/i,
     reportType: '',
@@ -136,6 +139,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         thumbnailUrl: { default: null },
         wavId: { default: null },
         color: { default: '' },
+        createNode: { default: false }
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -228,15 +232,30 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
     };
   }
 
-  // createPasteRules(): PasteRule[] {
-  //   return [
-  //     {
-  //       type: 'node',
-  //       nodeType: this.type,
-  //       regexp: this.options.pasteRuleRegexp
-  //     },
-  //   ];
-  // }
+  createPasteRules(): NodePasteRule[] {
+    return [
+      {
+        type: 'node',
+        nodeType: this.type,
+        regexp: this.options.pasteRuleRegexp,
+        getAttributes: (match: string[]) => {
+          const noteNode = this.type.create(
+            { noteUrl: match[0], createNode: true }
+            );
+            return noteNode.attrs;
+        },
+        getContent: (match: string[]) => {
+          const noteNode = this.type.create(
+            {
+              noteUrl: match[0], createNode: true
+            }
+          )
+
+          return noteNode.content;
+        }
+      },
+    ];
+  }
 
   /**
    * Track click events passed through to the editor.
@@ -269,6 +288,16 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       },
     };
   }
+
+  @command()
+  replaceNoteWithLink(noteUrl: string, position: number): CommandFunction {
+    return ({ tr, dispatch }) => {
+      tr.delete(position, position + 1);
+      tr.insertText(noteUrl, position);
+      dispatch?.(tr);
+      return true;
+    };
+  };
 
   @command()
   insertNote(attributes: NoteAttributes, selection?: PrimitiveSelection): CommandFunction {
@@ -481,6 +510,13 @@ export interface NoteAttributes {
    * color
    **/
   color?: string;
+
+  /**
+   * Used to insert a note from noteUrl
+   * @default false
+   * @optional
+   */
+  createNode?: boolean;
 }
 
 declare global {

@@ -1,6 +1,7 @@
 import { useCommands } from "@remirror/react";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NoteComponent } from "./note-component";
+import { getNoteKeyFromNoteUrl } from "./utils/getNoteKeyFromUrl";
 import { INote } from "./utils/typings";
 
 const defaultObject = {};
@@ -11,14 +12,18 @@ export const VariantRenderer = ({
 }) => {
     const { getPosition, node } = restProps;
     const position = getPosition as () => number;
-    const {variant, id, noteUrl} = node.attrs;
+    const {variant, id, noteUrl, createNode = false } = node.attrs;
+    const [loadingNote, setLoadingNote] = useState(false);
+    const [showLinkPrompt, setShowLinkPrompt] = useState(createNode);
+   
     const Component = variantComponents[variant] || NoteComponent;
-    const { deleteFile, updateNote } = useCommands();
 
-    const getNoteDetails = useCallback(async () => {
+    const { deleteFile, updateNote, replaceNoteWithLink } = useCommands();
+
+    const getNoteDetails = useCallback(async (noteId?: string) => {
         // get note details
         try {
-            const url = `https://${window.location.host}/annotation_tool/events/${id}`;
+            const url = `https://${window.location.host}/annotation_tool/events/${id || noteId}`;
             const response = await fetch(url);
             const data: any = await response.json();
             if (data && data.id) {
@@ -28,8 +33,38 @@ export const VariantRenderer = ({
             }
         } catch (error) {
             console.error("Error while fetching note detail", error);
+            if (createNode) {
+                throw error;
+            }
+        } finally {
+            if (loadingNote) {
+                setLoadingNote(false);
+            }
+            if (showLinkPrompt) {
+                setShowLinkPrompt(false);
+            }
         }
-    }, [noteUrl]);
+    }, [noteUrl, loadingNote, showLinkPrompt]);
+
+    const fetchNoteFromLink = useCallback(async () => {
+
+        setLoadingNote(true);
+        try {
+            const noteKey = getNoteKeyFromNoteUrl(noteUrl);
+            const url = `https://${window.location.host}/annotation_tool/notes/${noteKey}/`;
+
+            const response = await fetch(url);
+
+            const [data] = await response.json() as any;
+
+            const { id: noteId } = data;
+
+            await getNoteDetails(noteId);
+        } catch (err) {
+            console.error("Error while fetching note detail", err);
+            replaceNoteWithLink(noteUrl, position());
+        }
+    }, [noteUrl, getNoteDetails, replaceNoteWithLink, noteUrl]);
 
     const updateThisNote = useCallback(
         (noteObject: INote) => {
@@ -42,9 +77,32 @@ export const VariantRenderer = ({
         deleteFile(position());
     }, [deleteFile, position]);
 
-    useEffect(() => {
-        getNoteDetails();
-    }, [getNoteDetails]);
+    const handleRevertClick = useCallback(() => {
+        replaceNoteWithLink(noteUrl, position());
+    }, [replaceNoteWithLink, position]);
 
-    return <Component {...restProps} />;
+    const handleInsertNote = useCallback(() => {
+        fetchNoteFromLink()
+    }, []);
+
+    useEffect(() => {
+        if (!createNode) {
+            getNoteDetails();
+        }
+    }, [getNoteDetails, createNode]);
+
+    return showLinkPrompt ? (
+        <div className="NOTE_LOADING_CONTAINER">
+            <div className="NOTE_REPLACE_INFO">
+                <a className="NOTE_INFO_LINK" href={noteUrl} rel="noopener noreferrer" target="_blank">
+                    {noteUrl}
+                </a>
+                <p>Looks like a link to a note. Do you want to insert a note ?</p>
+            </div>
+            <div className="NOTE_REPLACE_ACTIONS">
+                <button onClick={handleInsertNote} className="NOTE_REPLACE_PRIMARY">Yes</button>
+                <button onClick={handleRevertClick} className="NOTE_REPLACE_SECONDARY">No</button>
+            </div>
+        </div>
+    ) : <Component {...restProps} />;
 };
