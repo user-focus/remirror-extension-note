@@ -17,16 +17,19 @@ export const getNoteExtensionObject = (
   if (typeof updatedNoteObject === "undefined" || updatedNoteObject === null)
     return null;
   const {
-    title,
-    comment,
+    name,
+    description,
     interview,
     created_at,
-    created_by: createdBy,
     labels,
-    id,
+    event_class: id,
     end_time,
     start_time,
     subtitle,
+    wav,
+    author,
+    thumbnail_url,
+    color,
   } = updatedNoteObject;
   if (
     typeof previousNoteObject === "object" &&
@@ -37,14 +40,22 @@ export const getNoteExtensionObject = (
       ...previousNoteObject,
       id,
       interviewUrl: interview?.url,
-      title,
-      description: comment,
+      title: name,
+      description,
       duration: end_time - start_time,
-      interviewName: interview?.name,
+      interviewName: wav?.name,
       createdAt: created_at,
-      createdBy: createdBy?.first_name,
+      createdBy: author,
       labels,
       subtitle,
+      wavUrl: wav?.file,
+      fileType: wav?.file_type,
+      interviewLength: wav?.interview_length,
+      startTime: start_time,
+      endTime: end_time,
+      thumbnailUrl: thumbnail_url,
+      wavId: wav?.id,
+      color,
     };
   return null;
 };
