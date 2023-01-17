@@ -35,10 +35,6 @@ export const VariantRenderer = ({
             console.error("Error while fetching note detail", error);
             setNoteLoadError(true);
             replaceNoteWithLink(noteUrl, position(), insertText);
-        } finally {
-            if (loadingNote) {
-                setLoadingNote(false);
-            }
         }
     }, [noteUrl, loadingNote, loadingNote]);
 
@@ -53,13 +49,21 @@ export const VariantRenderer = ({
 
             const [data] = await response.json() as any;
 
-            const { id: noteId } = data;
-            console.log('note id ', noteId);
-            await getNoteDetails(noteId);
+            if (data) {
+                const { id: noteId } = data;
+                await getNoteDetails(noteId);
+            } else {
+                setNoteLoadError(true);
+                replaceNoteWithLink(noteUrl, position(), insertText);    
+            }
         } catch (err) {
             console.error("Error while fetching note detail", err);
             setNoteLoadError(true);
             replaceNoteWithLink(noteUrl, position(), insertText);
+        } finally {
+            if (loadingNote) {
+                setLoadingNote(false);
+            }
         }
     }, [noteUrl, getNoteDetails, replaceNoteWithLink, noteUrl]);
 
