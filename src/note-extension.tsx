@@ -45,6 +45,7 @@ export interface NoteOptions {
    **/
   variantComponents?: Record<string, ComponentType<NoteComponentProps>>;
   VariantDropdown?: ComponentType<VariantDropdownProps> | null;
+  Loader?: React.ComponentType<{}> | null;
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   createNode?: boolean;
@@ -82,6 +83,7 @@ export interface NoteOptions {
   defaultOptions: {
     variantComponents: {},
     VariantDropdown: null,
+    Loader: null,
     render: VariantRenderer,
     createNode: false,
     isEditable: false,
@@ -102,6 +104,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
     return this.options.render({
       ...props,
       VariantDropdown: this.options.VariantDropdown,
+      Loader: this.options.Loader,
       variantComponents: this.options.variantComponents,
       abort: () => { },
       context: undefined,

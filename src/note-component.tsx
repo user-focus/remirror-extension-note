@@ -11,6 +11,7 @@ import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./
 export type NoteComponentProps = NodeViewComponentProps & {
   variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
   VariantDropdown?:  any;
+  Loader?: React.ComponentType<{}> | null;
   context?: UploadContext;
   abort: () => void;
   isEditable?: boolean;
