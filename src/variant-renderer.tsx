@@ -14,6 +14,7 @@ export const VariantRenderer = ({
     const position = getPosition as () => number;
     const {variant, id, noteUrl, createNode = false } = node.attrs;
     const [loadingNote, setLoadingNote] = useState(createNode);
+    const [fetchedNote, setFetchedNote] = useState(false);
     const [noteLoadError, setNoteLoadError] = useState(false);
    
     const Component = variantComponents[variant] || NoteComponent;
@@ -27,6 +28,7 @@ export const VariantRenderer = ({
             const response = await fetch(url);
             const data: any = await response.json();
             if (data && data.id) {
+                setFetchedNote(true);
                 updateThisNote(data);
             } else {
                 deleteNote();
@@ -83,16 +85,16 @@ export const VariantRenderer = ({
     }, []);
 
     useEffect(() => {
-        if (!createNode) {
+        if (!createNode && !fetchedNote) {
             getNoteDetails();
         }
-    }, [getNoteDetails, createNode]);
+    }, [getNoteDetails, createNode, fetchedNote]);
 
     useEffect(() => {
         if (createNode) {
             handleInsertNoteFromLink();
         }
-    }, []);
+    }, [createNode]);
 
     return !loadingNote && !noteLoadError ? 
         <Component {...restProps} /> : 

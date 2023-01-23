@@ -338,7 +338,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
       if (node && node.type === this.type) {
         const newAttributes = getNoteExtensionObject(newNoteObject, node.attrs);
         if (!newAttributes) return false;
-        tr.setNodeMarkup(pos, node.type, newAttributes);
+        // Always make create node false when updating the note
+        tr.setNodeMarkup(pos, node.type, {...newAttributes, createNode: false});
         if (dispatch) dispatch(tr);
         return true;
       }
