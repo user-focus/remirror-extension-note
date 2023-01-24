@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import React, { ComponentType } from 'react';
 import {
   ApplySchemaAttributes,
   command,
@@ -25,11 +25,25 @@ import { NodeViewComponentProps } from '@remirror/react';
 // import { PasteRule } from '@remirror/pm/paste-rules';
 import type { CreateEventHandlers } from '@remirror/extension-events';
 
-import { NoteComponent, NoteComponentProps } from './note-component';
+import { NoteComponentProps } from './note-component';
 import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
 import { INote } from './utils/typings';
+import { VariantRenderer } from './variant-renderer';
+
+export type VariantDropdownProps = {
+  onVariantSelect: (variant: string) => void;
+};
 
 export interface NoteOptions {
+  /**
+   * variants - an object of variants to render
+   * @default {}
+   * @remarks
+   * This is an object of variants to render. The key is the variant name, and the value is a React component.
+   * The component will receive the following props:
+   **/
+  variantComponents?: Record<string, ComponentType<NoteComponentProps>>;
+  VariantDropdown?: ComponentType<VariantDropdownProps> | null;
   render?: (props: NoteComponentProps) => React.ReactElement<HTMLElement> | null;
 
   /**
@@ -53,6 +67,10 @@ export interface NoteOptions {
    * Is the note editable
    */
   isEditable?: boolean
+  /**
+   * Report type
+   */
+  reportType?: string
 }
 
 /**
@@ -60,12 +78,17 @@ export interface NoteOptions {
  */
 @extension<NoteOptions>({
   defaultOptions: {
-    render: NoteComponent,
+    variantComponents: {},
+    VariantDropdown: null,
+    render: VariantRenderer,
     isEditable: false,
     pasteRuleRegexp: /^((?!image).)*$/i,
+    reportType: '',
   },
   handlerKeyOptions: { onClick: { earlyReturnValue: true } },
   handlerKeys: ['onDeleteFile', 'onClick'],
+  staticKeys:[],
+  customHandlerKeys: [],
 })
 export class NoteExtension extends NodeExtension<NoteOptions> {
   get name() {
@@ -75,9 +98,12 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   ReactComponent: ComponentType<NodeViewComponentProps> = (props) => {
     return this.options.render({
       ...props,
+      VariantDropdown: this.options.VariantDropdown,
+      variantComponents: this.options.variantComponents,
       abort: () => { },
       context: undefined,
       isEditable: this.options.isEditable,
+      reportType: this.options.reportType,
     });
   };
 
@@ -101,6 +127,15 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         noteUrl: { default: '' },
         error: { default: null },
         subtitle: { default: '' },
+        variant: { default: 'default' },
+        wavUrl: { default: '' },
+        interviewLength: { default: null },
+        startTime: { default: null },
+        endTime: { default: null },
+        fileType: { default: null },
+        thumbnailUrl: { default: null },
+        wavId: { default: null },
+        color: { default: '' },
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -123,7 +158,15 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const createdAt = anchor.getAttribute('data-created-at');
             const labels = JSON.parse(anchor.getAttribute('data-labels') ?? '[]');
             const noteUrl = anchor.getAttribute('data-note-url');
-
+            const variant = anchor.getAttribute('data-variant');
+            const wavUrl = anchor.getAttribute('data-wav-url');
+            const interviewLength = anchor.getAttribute('data-interview-length');
+            const startTime = anchor.getAttribute('data-start-time');
+            const endTime = anchor.getAttribute('data-end-time');
+            const fileType = anchor.getAttribute('data-file-type');
+            const thumbnailUrl = anchor.getAttribute('data-thumbnail-url');
+            const wavId = anchor.getAttribute('data-wav-id');
+            const color = anchor.getAttribute('data-color');
             return {
               ...extra.parse(dom),
               id,
@@ -136,6 +179,15 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               createdAt,
               labels,
               noteUrl,
+              variant,
+              wavUrl,
+              interviewLength,
+              startTime,
+              endTime,
+              fileType,
+              thumbnailUrl,
+              wavId,
+              color,
             };
           },
         },
@@ -156,6 +208,15 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-created-at': node.attrs.createdAt,
           'data-labels': JSON.stringify(node.attrs.labels),
           'data-note-url': node.attrs.noteUrl,
+          'data-variant': node.attrs.variant,
+          'data-wav-url': node.attrs.wavUrl,
+          'data-interview-length': node.attrs.interviewLength,
+          'data-start-time': node.attrs.startTime,
+          'data-end-time': node.attrs.endTime,
+          'data-file-type': node.attrs.fileType,
+          'data-thumbnail-url': node.attrs.thumbnailUrl,
+          'data-wav-id': node.attrs.wavId,
+          'data-color': node.attrs.color,
         };
 
         if (error) {
@@ -200,7 +261,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         const nodeWithPosition = clickState.getNode(this.type);
         const data = nodeWithPosition?.node.attrs;
 
-        if (!nodeWithPosition) {
+        if (!nodeWithPosition || data?.variant === 'video-text' || data?.variant === 'video') {
           return;
         }
 
@@ -250,6 +311,23 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
 
       if (node && node.type === this.type) {
         const newAttributes = getNoteExtensionObject(newNoteObject, node.attrs);
+        if (!newAttributes) return false;
+        tr.setNodeMarkup(pos, node.type, newAttributes);
+        if (dispatch) dispatch(tr);
+        return true;
+      }
+
+      return false;
+    };
+  };
+
+  @command()
+  updateVariant(pos: number, variant: string): CommandFunction {
+    return ({ tr, state, dispatch }) => {
+      const node = state.doc.nodeAt(pos);
+
+      if (node && node.type === this.type) {
+        const newAttributes = { ...node.attrs, variant };
         if (!newAttributes) return false;
         tr.setNodeMarkup(pos, node.type, newAttributes);
         if (dispatch) dispatch(tr);
@@ -360,6 +438,55 @@ export interface NoteAttributes {
    * Error state for the file, e.g. upload failed
    */
   error?: string | null;
+
+  /**
+   * Variant of the note, e.g. playlist, player, etc.
+   * @default 'default'
+   * @optional
+   * @example 'playlist'
+   */
+  variant?: string;
+
+  /**
+   * URL where the note can be viewed
+   * @default ''
+   **/
+  wavUrl?: string;
+
+  /**
+   * interview length
+   **/
+  interviewLength?: number;
+
+  /**
+   * start time
+   **/
+  startTime?: number;
+
+  /**
+   * end time
+   **/
+  endTime?: number;
+
+  /**
+   * File type
+   **/
+  fileType?: string;
+
+  /**
+   * Thumbnail URL
+   **/
+  thumbnailUrl?: string;
+
+  /**
+   * Wav id
+   **/
+  wavId?: string;
+
+  /**
+   * color
+   **/
+  color?: string;
 }
 
 declare global {

@@ -7,12 +7,14 @@ import { parseTime } from './utils/parseTime';
 import Tippy from '@tippyjs/react';
 
 import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./icons";
-import { INote } from "./utils/typings";
 
 export type NoteComponentProps = NodeViewComponentProps & {
+  variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
+  VariantDropdown?:  any;
   context?: UploadContext;
   abort: () => void;
   isEditable?: boolean;
+  reportType?: string;
 };
 
 const LabelSeperator = () => {
@@ -42,7 +44,9 @@ const ClusterButton = (props: { position: () => number; }) => {
   };
 
   return (
-    <Tippy placement="bottom" content="Make cluster">
+    <Tippy  placement="bottom" content={
+      <span className="note-tooltip">Make cluster</span>
+    } >
       <button className="more-options-button create-cluster-button" onClick={createCluster}>
         <ClusterIcon />
       </button>
@@ -66,7 +70,9 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
       .run();
   }
   return (
-    <Tippy placement="bottom" content="Convert note’s transcript to quote">
+    <Tippy placement="bottom" content={
+      <span className="note-tooltip">Convert note’s transcript to quote</span>
+    } >
       <button className="more-options-button convert-to-quote-button" onClick={handleConvertToQuote}>
         <ConvertToQuoteIcon />
       </button>
@@ -74,10 +80,10 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable, VariantDropdown }) => {
   const noteDetails = node.attrs as NoteAttributes;
-  const { noteUrl = '' } = noteDetails;
-  const { deleteFile, updateNote } = useCommands();
+  const { noteUrl = ''} = noteDetails;
+  const { deleteFile, updateVariant } = useCommands();
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
@@ -85,13 +91,6 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const deleteNote = () => {
     deleteFile(position());
   };
-
-  const updateThisNote = useCallback(
-    (noteObject: INote) => {
-      updateNote(position(), noteObject);
-    },
-    [updateNote, position]
-  );
 
   const toggleDropdownMenu = () => {
     setShowDropdown(!showDropdown);
@@ -118,27 +117,13 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     };
   }, [showDropdown]);
 
-  const getNoteDetails = useCallback(async () => {
-    // get note details
-    try {
-      const response = await fetch(noteUrl.replace('event', 'notes'));
-      const data: any[] = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        updateThisNote(data[0]);
-      } else {
-        deleteNote();
-      }
-    } catch (error) {
-      console.error('Error while fetching note details', error);
-    }
-  }, [noteUrl]);
-
-  useEffect(() => {
-    getNoteDetails();
-  }, [getNoteDetails]);
+  const onVariantSelect = useCallback((variant: string) => {
+    updateVariant(position(), variant);
+  }, [updateVariant, position]);
 
   return (
     <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
+      <a href={noteUrl} data-print-id="note-link" className="NOTE_LINK" />
       <div className="NOTE_LABELS_CONTAINER">
         {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
           <div className="NOTE_LABEL" key={label.id}>
@@ -172,6 +157,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
             subtitle={noteDetails.subtitle}
             interviewName={noteDetails.interviewName}
             noteUrl={noteUrl} />
+          <VariantDropdown selectedVariant="text" onVariantSelect={onVariantSelect}/>
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
