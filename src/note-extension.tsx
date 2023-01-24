@@ -285,6 +285,12 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   @command()
   deleteFile(pos: number): CommandFunction {
     return ({ tr, state, dispatch }) => {
+      if (typeof pos !== 'number' || isNaN(pos)) {
+          tr.deleteSelection();
+          dispatch?.(tr);
+          return true;
+      }
+
       const node = state.doc.nodeAt(pos);
 
       if (node && node.type === this.type) {
