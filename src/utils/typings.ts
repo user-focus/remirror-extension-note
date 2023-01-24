@@ -5,11 +5,11 @@ export interface INote {
   /**
    * Title of the note, can a question
    */
-  title: string;
+  name: string;
   /**
    * Description of the note
    */
-  comment: string;
+  description: string;
   /**
    * Creator details
    */
@@ -33,7 +33,7 @@ export interface INote {
   /**
    * Unique id for the note
    */
-  id: unknown;
+  event_class: unknown;
   /**
    * List of labels
    */
@@ -42,6 +42,28 @@ export interface INote {
    * Transcription subtitle
    */
   subtitle: string;
+  /**
+   * Variant of the note
+   */
+  variant?: string;
+  /**
+   * Wav file details
+   **/
+  wav: any;
+  /**
+   * Author of the note
+   * */
+  author: string;
+
+  /**
+   * Thumbnail url
+   * */
+  thumbnail_url: string;
+
+  /**
+   * Color of the note
+   * */
+  color: string;
 }
 
 /**
