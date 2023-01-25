@@ -30,6 +30,7 @@ import { getNoteExtensionObject } from './utils/getNoteExtensionObject';
 import { INote } from './utils/typings';
 import { VariantRenderer } from './variant-renderer';
 import { NodePasteRule } from '@remirror/pm/paste-rules';
+import { NodeSelection } from '@remirror/pm/state';
 
 export type VariantDropdownProps = {
   onVariantSelect: (variant: string) => void;
@@ -294,10 +295,21 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
 
   @command()
   replaceNoteWithLink(noteUrl: string, position: number, insertText: (text: string | (() => Promise<string>), options?: any) => void): CommandFunction {
-    return ({ tr, dispatch }) => {
+    return ({ tr, dispatch, state, view }) => {
+
+      const sel = NodeSelection.create(state.doc, position);
+
+      tr.setSelection(sel);
       tr.delete(position, position + 1);
       dispatch?.(tr);
-      insertText(noteUrl, position);
+      view?.focus();
+      insertText(noteUrl, {
+        marks: {
+          link: {
+            href: noteUrl,
+          },
+        },
+      });
       return true;
     };
   };
