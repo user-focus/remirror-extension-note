@@ -1,6 +1,6 @@
 {
   "name": "remirror-extension-note",
-  "version": "1.0.33",
+  "version": "1.0.34-rc.0",
   "description": "A note extension built for remirror rich text editor",
   "author": "Santosh Viswanatham",
   "license": "MIT",
