@@ -4,7 +4,7 @@
  * @returns string
  */
 export const getNoteKeyFromNoteUrl = (noteUrl: string = "") => {
-    let noteKey;
+    let noteKey = '';
     if (noteUrl.includes("/annotation_tool/event/")) {
         noteKey = noteUrl.split("/annotation_tool/event/")[1] || "";
     } else if (noteUrl.includes("/note/")) {
