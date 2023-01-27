@@ -24,7 +24,11 @@ export const VariantRenderer = ({
     const getNoteDetails = useCallback(async (noteId?: string) => {
         // get note details
         try {
-            const url = `https://${window.location.host}/annotation_tool/events/${id || noteId}`;
+            let baseUrl = window.location.host;
+            if (baseUrl.includes("localhost")) {
+                baseUrl = "localhost:8000";
+            }
+            const url = `https://${baseUrl}/annotation_tool/events/${id || noteId}`;
             const response = await fetch(url);
             const data: any = await response.json();
             if (data && data.id) {
@@ -44,8 +48,12 @@ export const VariantRenderer = ({
 
         setLoadingNote(true);
         try {
+            let baseUrl = window.location.host;
+            if (baseUrl.includes("localhost")) {
+                baseUrl = "localhost:8000";
+            }
             const noteKey = getNoteKeyFromNoteUrl(noteUrl);
-            const url = `https://${window.location.host}/annotation_tool/notes/${noteKey}/`;
+            const url = `https://${baseUrl}/annotation_tool/notes/${noteKey}/`;
 
             const response = await fetch(url);
 
