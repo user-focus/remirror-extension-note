@@ -351,6 +351,11 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   @command()
   updateNote(pos: number, newNoteObject: INote): CommandFunction {
     return ({ tr, state, dispatch }) => {
+
+      if (pos !== 0 && !pos) {
+        return false;
+      }
+
       const node = state.doc.nodeAt(pos);
 
       if (node && node.type === this.type) {
