@@ -297,6 +297,10 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
   replaceNoteWithLink(noteUrl: string, position: number, insertText: (text: string | (() => Promise<string>), options?: any) => void): CommandFunction {
     return ({ tr, dispatch, state, view }) => {
 
+      if (position !== 0 && !position) {
+        return false;
+      }
+
       const sel = NodeSelection.create(state.doc, position);
 
       tr.setSelection(sel);
