@@ -10,7 +10,7 @@ export const getNoteKeyFromNoteUrl = (noteUrl: string = "") => {
     } else if (noteUrl.includes("/note/")) {
         noteKey = noteUrl.split("/note/")[1] || "";
     }
-    if (noteKey.endsWith("/")) {
+    if (noteKey && noteKey.endsWith("/")) {
         return noteKey.slice(0, -1);
     }
     return noteKey;
