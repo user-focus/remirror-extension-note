@@ -30,6 +30,7 @@ export const getNoteExtensionObject = (
     author,
     thumbnail_url,
     color,
+    key,
   } = updatedNoteObject;
   if (
     typeof previousNoteObject === "object" &&
@@ -56,6 +57,7 @@ export const getNoteExtensionObject = (
       thumbnailUrl: thumbnail_url,
       wavId: wav?.id,
       color,
+      key,
     };
   return null;
 };

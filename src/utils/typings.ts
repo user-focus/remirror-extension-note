@@ -64,6 +64,11 @@ export interface INote {
    * Color of the note
    * */
   color: string;
+
+  /**
+   * Key of the note
+   * */
+  key: string;
 }
 
 /**

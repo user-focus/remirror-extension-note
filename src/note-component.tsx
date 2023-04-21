@@ -127,13 +127,13 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const copyNoteLink = useCallback(() => {
     // copy to clipboard
     const key = noteDetails.key;
-    const url = `${window.location.origin}/note/${key}`;
+    const url = `${window.location.origin}/note/${key}/`;
     navigator.clipboard.writeText(url);
     setCopyText('Copied!');
     setTimeout(() => {
       setCopyText('Copy note share link');
     }, 2000);
-    }, []);
+    }, [noteDetails]);
 
   return (
     <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
