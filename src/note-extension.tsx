@@ -548,6 +548,12 @@ export interface NoteAttributes {
    * @optional
    */
   createNode?: boolean;
+
+  /**
+   * key of the note
+   * @default false
+   */
+  key?: string;
 }
 
 declare global {

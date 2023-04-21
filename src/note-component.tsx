@@ -7,6 +7,7 @@ import { parseTime } from './utils/parseTime';
 import Tippy from '@tippyjs/react';
 
 import { MoreOptionsIcon, DeleteIcon, ClusterIcon, ConvertToQuoteIcon } from "./icons";
+import { CopyLinkIcon } from "./icons/CopyLinkIcon";
 
 export type NoteComponentProps = NodeViewComponentProps & {
   variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
@@ -88,6 +89,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
+  const [copyText, setCopyText] = useState('Copy note share link');
 
   const deleteNote = () => {
     deleteFile(position());
@@ -121,6 +123,17 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const onVariantSelect = useCallback((variant: string) => {
     updateVariant(position(), variant);
   }, [updateVariant, position]);
+
+  const copyNoteLink = useCallback(() => {
+    // copy to clipboard
+    const key = noteDetails.key;
+    const url = `${window.location.origin}/note/${key}`;
+    navigator.clipboard.writeText(url);
+    setCopyText('Copied!');
+    setTimeout(() => {
+      setCopyText('Copy note share link');
+    }, 2000);
+    }, []);
 
   return (
     <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
@@ -162,6 +175,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
+              <button className="copy-note-button" onClick={copyNoteLink}><CopyLinkIcon />{copyText}</button>
               <button className="delete-note-button" onClick={deleteNote}><DeleteIcon />Remove from Insight</button>
             </div>
           )}
