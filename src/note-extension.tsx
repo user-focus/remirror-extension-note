@@ -143,7 +143,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
         thumbnailUrl: { default: null },
         wavId: { default: null },
         color: { default: '' },
-        createNode: { default: false }
+        createNode: { default: false },
+        key: { default: null },
       },
       selectable: true,
       draggable: this.options.isEditable,
@@ -175,6 +176,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             const thumbnailUrl = anchor.getAttribute('data-thumbnail-url');
             const wavId = anchor.getAttribute('data-wav-id');
             const color = anchor.getAttribute('data-color');
+            const key = anchor.getAttribute('data-key');
             return {
               ...extra.parse(dom),
               id,
@@ -196,6 +198,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
               thumbnailUrl,
               wavId,
               color,
+              key,
             };
           },
         },
@@ -225,6 +228,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
           'data-thumbnail-url': node.attrs.thumbnailUrl,
           'data-wav-id': node.attrs.wavId,
           'data-color': node.attrs.color,
+          'data-key': node.attrs.key,
         };
 
         if (error) {
@@ -548,6 +552,12 @@ export interface NoteAttributes {
    * @optional
    */
   createNode?: boolean;
+
+  /**
+   * key of the note
+   * @default false
+   */
+  key?: string;
 }
 
 declare global {

@@ -12,11 +12,11 @@ export const VariantRenderer = ({
 }) => {
     const { getPosition, node, Loader } = restProps;
     const position = getPosition as () => number;
-    const {variant, id, noteUrl, createNode = false } = node.attrs;
+    const { variant, id, noteUrl, createNode = false } = node.attrs;
     const [loadingNote, setLoadingNote] = useState(createNode);
     const [fetchedNote, setFetchedNote] = useState(false);
     const [noteLoadError, setNoteLoadError] = useState(false);
-   
+
     const Component = variantComponents[variant] || NoteComponent;
 
     const { deleteFile, updateNote, replaceNoteWithLink, insertText } = useCommands();
@@ -25,10 +25,12 @@ export const VariantRenderer = ({
         // get note details
         try {
             let baseUrl = window.location.host;
+            let url = '';
             if (baseUrl.includes("localhost")) {
-                baseUrl = "localhost:8000";
+                url = `http://localhost:8000/annotation_tool/events/${id || noteId}`;
+            } else {
+                url = `https://${baseUrl}/annotation_tool/events/${id || noteId}`;
             }
-            const url = `https://${baseUrl}/annotation_tool/events/${id || noteId}`;
             const response = await fetch(url);
             const data: any = await response.json();
             if (data && data.id) {
@@ -45,15 +47,16 @@ export const VariantRenderer = ({
     }, [noteUrl, loadingNote, loadingNote]);
 
     const fetchNoteFromLink = useCallback(async () => {
-
         setLoadingNote(true);
         try {
             let baseUrl = window.location.host;
-            if (baseUrl.includes("localhost")) {
-                baseUrl = "localhost:8000";
-            }
+            let url = '';
             const noteKey = getNoteKeyFromNoteUrl(noteUrl);
-            const url = `https://${baseUrl}/annotation_tool/notes/${noteKey}/`;
+            if (baseUrl.includes("localhost")) {
+                url = `http://localhost:8000/annotation_tool/notes/${noteKey}/`;
+            } else {
+                url = `https://${baseUrl}/annotation_tool/notes/${noteKey}/`;
+            }
 
             const response = await fetch(url);
 
@@ -64,7 +67,7 @@ export const VariantRenderer = ({
                 await getNoteDetails(noteId);
             } else {
                 setNoteLoadError(true);
-                replaceNoteWithLink(noteUrl, position(), insertText);    
+                replaceNoteWithLink(noteUrl, position(), insertText);
             }
         } catch (err) {
             console.error("Error while fetching note detail", err);
@@ -104,8 +107,8 @@ export const VariantRenderer = ({
         }
     }, [createNode]);
 
-    return !loadingNote && !noteLoadError ? 
-        <Component {...restProps} /> : 
+    return !loadingNote && !noteLoadError ?
+        <Component {...restProps} /> :
         (
             <div className="NOTE_ROOT NOTE_ROOT_LOADER">
                 <Loader />
