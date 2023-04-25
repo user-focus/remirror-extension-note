@@ -124,15 +124,19 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     updateVariant(position(), variant);
   }, [updateVariant, position]);
 
-  const copyNoteLink = useCallback(() => {
-    // copy to clipboard
-    const key = noteDetails.key;
-    const url = `${window.location.origin}/note/${key}/`;
-    navigator.clipboard.writeText(url);
-    setCopyText('Copied!');
-    setTimeout(() => {
-      setCopyText('Copy note share link');
-    }, 2000);
+  const copyNoteLink = useCallback(async () => {
+      // copy to clipboard
+      try {
+        const key = noteDetails.key;
+        const url = `${window.location.origin}/note/${key}/`;
+        await navigator.clipboard.writeText(url);
+        setCopyText('Copied!');
+        setTimeout(() => {
+          setCopyText('Copy note share link');
+        }, 2000);
+      } catch (err) {
+        console.log('Failed to copy: ', err);
+      }
     }, [noteDetails]);
 
   return (
