@@ -89,7 +89,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
   const menuContainer = useRef<HTMLDivElement>(null);
-  const [copyText, setCopyText] = useState('Copy note share link');
+  const [copyText, setCopyText] = useState('Copy note link');
 
   const deleteNote = () => {
     deleteFile(position());
