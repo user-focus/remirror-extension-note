@@ -175,7 +175,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
             subtitle={noteDetails.subtitle}
             interviewName={noteDetails.interviewName}
             noteUrl={noteUrl} />
-          <VariantDropdown selectedVariant="text" onVariantSelect={onVariantSelect}/>
+          {noteDetails.fileType === 'VIDEO' && <VariantDropdown selectedVariant="text" onVariantSelect={onVariantSelect}/>}
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">
