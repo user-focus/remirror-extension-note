@@ -95,7 +95,7 @@ export const VariantRenderer = ({
                 }
             } catch (error) {
                 if (error.status === 404) {
-                    replaceNoteWithLink(noteUrl, position(), insertText);
+                    deleteNote();
                     setNoteLoadError(true);
                 }
                 console.error("Error while fetching note detail", error);
