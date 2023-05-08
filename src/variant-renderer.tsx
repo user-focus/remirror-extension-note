@@ -37,7 +37,7 @@ export const VariantRenderer = ({
                 }`;
             }
             const response = await fetch(url);
-            if (!response.ok && response.status === 404) {
+            if (!response.ok) {
                 throw response;
             }
             const data: any = await response.json();
@@ -64,7 +64,7 @@ export const VariantRenderer = ({
                 }/`;
             }
             const response = await fetch(url);
-            if (!response.ok && response.status === 404) {
+            if (!response.ok) {
                 throw response;
             }
             const data: any = await response.json();
