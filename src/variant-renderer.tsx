@@ -12,45 +12,103 @@ export const VariantRenderer = ({
 }) => {
     const { getPosition, node, Loader } = restProps;
     const position = getPosition as () => number;
-    const { variant, noteUrl, createNode = false, key, } = node.attrs;
+    const { variant, noteUrl, createNode = false, key, id } = node.attrs;
     const [loadingNote, setLoadingNote] = useState(createNode);
     const [fetchedNote, setFetchedNote] = useState(false);
     const [noteLoadError, setNoteLoadError] = useState(false);
 
     const Component = variantComponents[variant] || NoteComponent;
 
-    const { deleteFile, updateNote, replaceNoteWithLink, insertText } = useCommands();
+    const { deleteFile, updateNote, replaceNoteWithLink, insertText } =
+        useCommands();
 
-    const getNoteDetails = useCallback(async (noteKey?: string) => {
-        // get note details
-        try {
+    const getNoteDetailsById = useCallback(
+        async (noteId?: string) => {
+            // get note details
             let baseUrl = window.location.host;
-            let url = '';
+            let url = "";
             if (baseUrl.includes("localhost")) {
-                url = `http://localhost:8000/annotation_tool/events/key/${key || noteKey}/`;
+                url = `http://localhost:8000/annotation_tool/events/${
+                    id || noteId
+                }`;
             } else {
-                url = `https://${baseUrl}/annotation_tool/events/key/${key || noteKey}/`;
+                url = `https://${baseUrl}/annotation_tool/events/${
+                    id || noteId
+                }`;
             }
             const response = await fetch(url);
-            const data: any = await response.json();
-            if (data && data.id) {
-                setFetchedNote(true);
-                updateThisNote(data);
-            } else {
-                deleteNote();
+            if (!response.ok) {
+                throw response;
             }
-        } catch (error) {
-            console.error("Error while fetching note detail", error);
-            setNoteLoadError(true);
-            replaceNoteWithLink(noteUrl, position(), insertText);
-        }
-    }, [noteUrl, loadingNote, loadingNote]);
+            const data: any = await response.json();
+            return data;
+        },
+        [noteUrl, loadingNote, loadingNote]
+    );
+
+    const getNoteDetailsByKey = useCallback(
+        async (noteKey?: string) => {
+            // get note details
+            let baseUrl = window.location.host;
+            let url = "";
+            if (!noteKey) {
+                noteKey = getNoteKeyFromNoteUrl(noteUrl);
+            }
+            if (baseUrl.includes("localhost")) {
+                url = `http://localhost:8000/annotation_tool/events/key/${
+                    key || noteKey
+                }/`;
+            } else {
+                url = `https://${baseUrl}/annotation_tool/events/key/${
+                    key || noteKey
+                }/`;
+            }
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw response;
+            }
+            const data: any = await response.json();
+            return data;
+        },
+        [noteUrl, loadingNote, loadingNote]
+    );
+
+    const getNoteDetails = useCallback(
+        async (noteKeyArg?: string) => {
+            // get note details
+            try {
+                const noteKey =
+                    noteKeyArg || key || getNoteKeyFromNoteUrl(noteUrl);
+                let data = null;
+
+                if (noteKey) {
+                    data = await getNoteDetailsByKey(noteKey);
+                } else {
+                    data = await getNoteDetailsById();
+                }
+
+                if (data && data.id) {
+                    setFetchedNote(true);
+                    updateThisNote(data);
+                } else {
+                    deleteNote();
+                }
+            } catch (error) {
+                if (error.status === 404) {
+                    deleteNote();
+                    setNoteLoadError(true);
+                }
+                console.error("Error while fetching note detail", error);
+            }
+        },
+        [noteUrl, loadingNote, loadingNote]
+    );
 
     const fetchNoteFromLink = useCallback(async () => {
         setLoadingNote(true);
         try {
             let baseUrl = window.location.host;
-            let url = '';
+            let url = "";
             const noteKey = getNoteKeyFromNoteUrl(noteUrl);
             if (baseUrl.includes("localhost")) {
                 url = `http://localhost:8000/annotation_tool/notes/${noteKey}/`;
@@ -60,7 +118,7 @@ export const VariantRenderer = ({
 
             const response = await fetch(url);
 
-            const [data] = await response.json() as any;
+            const [data] = (await response.json()) as any;
 
             if (data) {
                 await getNoteDetails(noteKey);
@@ -106,11 +164,11 @@ export const VariantRenderer = ({
         }
     }, [createNode]);
 
-    return !loadingNote && !noteLoadError ?
-        <Component {...restProps} /> :
-        (
-            <div className="NOTE_ROOT NOTE_ROOT_LOADER">
-                <Loader />
-            </div>
-        );
+    return !loadingNote && !noteLoadError ? (
+        <Component {...restProps} />
+    ) : (
+        <div className="NOTE_ROOT NOTE_ROOT_LOADER">
+            <Loader />
+        </div>
+    );
 };
