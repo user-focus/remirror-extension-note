@@ -154,7 +154,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
                 key: { default: null },
             },
             selectable: true,
-            draggable: this.options.getCanEdit(),
+            draggable: this.options.getCanEdit?.(),
             atom: true,
             content: "",
             ...override,
