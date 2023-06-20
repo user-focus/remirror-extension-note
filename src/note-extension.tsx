@@ -74,7 +74,7 @@ export interface NoteOptions {
     /**
      * Function to check if the note is editable
      */
-    getCanEdit?: () => void;
+    getCanEdit?: () => boolean;
     /**
      * Report type
      */
@@ -91,7 +91,7 @@ export interface NoteOptions {
         Loader: null,
         render: VariantRenderer,
         createNode: false,
-        getCanEdit: () => void,
+        getCanEdit: () => true,
         pasteRuleRegexp: /^((?!image).)*$/i,
         reportType: "",
     },
