@@ -15,7 +15,7 @@ export type NoteComponentProps = NodeViewComponentProps & {
   Loader?: React.ComponentType<{}> | null;
   context?: UploadContext;
   abort: () => void;
-  getCanEdit?: () => boolean,
+  getCanEdit?: () => boolean;
   reportType?: string;
 };
 
