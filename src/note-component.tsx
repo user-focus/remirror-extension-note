@@ -15,7 +15,7 @@ export type NoteComponentProps = NodeViewComponentProps & {
   Loader?: React.ComponentType<{}> | null;
   context?: UploadContext;
   abort: () => void;
-  isEditable?: boolean;
+  getCanEdit?: () => boolean;
   reportType?: string;
 };
 
@@ -82,7 +82,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
   )
 }
 
-export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, isEditable, VariantDropdown }) => {
+export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, getCanEdit, VariantDropdown }) => {
   const noteDetails = node.attrs as NoteAttributes;
   const { noteUrl = ''} = noteDetails;
   const { deleteFile, updateVariant } = useCommands();
@@ -140,7 +140,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     }, [noteDetails]);
 
   return (
-    <div className={`NOTE_ROOT ${ isEditable ? 'NOTE_EDITABLE' : '' }`}>
+    <div className={`NOTE_ROOT ${ getCanEdit() ? 'NOTE_EDITABLE' : '' }`}>
       <a href={noteUrl} data-print-id="note-link" className="NOTE_LINK" />
       <div className="NOTE_LABELS_CONTAINER">
         {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
