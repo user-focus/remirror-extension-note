@@ -140,7 +140,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
     }, [noteDetails]);
 
   return (
-    <div className={`NOTE_ROOT ${ getCanEdit() ? 'NOTE_EDITABLE' : '' }`}>
+    <div className={`NOTE_ROOT ${ getCanEdit?.() ? 'NOTE_EDITABLE' : '' }`}>
       <a href={noteUrl} data-print-id="note-link" className="NOTE_LINK" />
       <div className="NOTE_LABELS_CONTAINER">
         {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
