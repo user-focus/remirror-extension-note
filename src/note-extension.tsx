@@ -72,9 +72,10 @@ export interface NoteOptions {
         (props: { tr: Transaction; pos: number; node: ProsemirrorNode }) => void
     >;
     /**
-     * Function to check if the note is editable
+     * Is the note in edit mode
      */
-    getCanEdit?: () => boolean;
+    isEditMode?: boolean;
+
     /**
      * Report type
      */
@@ -91,7 +92,7 @@ export interface NoteOptions {
         Loader: null,
         render: VariantRenderer,
         createNode: false,
-        getCanEdit: () => true,
+        isEditMode: false,
         pasteRuleRegexp: /^((?!image).)*$/i,
         reportType: "",
     },
@@ -113,7 +114,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             variantComponents: this.options.variantComponents,
             abort: () => {},
             context: undefined,
-            getCanEdit: this.options.getCanEdit,
+            isEditMode: this.options.isEditMode,
             reportType: this.options.reportType,
         });
     };
@@ -154,7 +155,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
                 key: { default: null },
             },
             selectable: true,
-            draggable: this.options.getCanEdit?.(),
+            draggable: this.options.isEditMode,
             atom: true,
             content: "",
             ...override,
