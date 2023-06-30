@@ -1,6 +1,6 @@
 {
   "name": "remirror-extension-note",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "A note extension built for remirror rich text editor",
   "author": "Santosh Viswanatham",
   "license": "MIT",
@@ -21,17 +21,16 @@
   "scripts": {
     "build": "yarn build:esm && yarn build:cjs",
     "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs --outDir lib/cjs",
-    "prepare": "yarn build"
+    "build:cjs": "tsc --module commonjs --outDir lib/cjs"
   },
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
   "peerDependencies": {
-    "@remirror/pm": "^1.0.9",
-    "@remirror/react": "^1.0.19",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "@remirror/pm": "^2.0.0",
+    "@remirror/react": "^2.0.10",
+    "react": ">=17.0.2 || ^18.0.0",
+    "react-dom": ">=17.0.2 || ^18.0.0"
   },
   "dependencies": {
     "@tippyjs/react": "^4.2.6",
