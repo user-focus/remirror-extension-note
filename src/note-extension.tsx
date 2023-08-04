@@ -112,7 +112,7 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             VariantDropdown: this.options.VariantDropdown,
             Loader: this.options.Loader,
             variantComponents: this.options.variantComponents,
-            abort: () => {},
+            abort: () => { },
             context: undefined,
             getCanEdit: this.options.getCanEdit,
             reportType: this.options.reportType,
@@ -466,6 +466,8 @@ export class NoteExtension extends NodeExtension<NoteOptions> {
             );
             const { id, subtitle, interviewName, noteUrl } = attributes;
 
+            // Updating this will also need to update migrations
+            // in BE for extracting note ids
             const node = htmlToProsemirrorNode({
                 content: `<blockquote class="note-quote" id="note-quote-${id}">
           <p class="subtitle">${subtitle}</p>
