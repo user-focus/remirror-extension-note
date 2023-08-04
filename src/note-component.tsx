@@ -11,21 +11,13 @@ import { CopyLinkIcon } from "./icons/CopyLinkIcon";
 
 export type NoteComponentProps = NodeViewComponentProps & {
   variantComponents?: Record<string, React.ComponentType<NoteComponentProps>>;
-  VariantDropdown?:  any;
+  VariantDropdown?: any;
   Loader?: React.ComponentType<{}> | null;
   context?: UploadContext;
   abort: () => void;
   getCanEdit?: () => boolean;
   reportType?: string;
 };
-
-const LabelSeperator = () => {
-  return (
-    <svg fill="none" height="6" width="5" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 3L.5 5.598V.402L5 3z" fill="#555" />
-    </svg>
-  )
-}
 
 const DEFAULT_CLUSTER_TITLE = 'Untitled cluster';
 
@@ -42,11 +34,12 @@ const ClusterButton = (props: { position: () => number; }) => {
         from: position() + 1,
         to: position() + DEFAULT_CLUSTER_TITLE.length + 2
       }) // select the title
+      .toggleHeading({ level: 2 }) // toggle the heading
       .run();
   };
 
   return (
-    <Tippy  placement="bottom" content={
+    <Tippy placement="bottom" content={
       <span className="note-tooltip">Make cluster</span>
     } >
       <button className="more-options-button create-cluster-button" onClick={createCluster}>
@@ -84,7 +77,7 @@ const ConvertToQuoteButton = (props: { position: () => number; id: any; noteUrl:
 
 export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition, getCanEdit, VariantDropdown }) => {
   const noteDetails = node.attrs as NoteAttributes;
-  const { noteUrl = ''} = noteDetails;
+  const { noteUrl = '' } = noteDetails;
   const { deleteFile, updateVariant } = useCommands();
   const position = getPosition as () => number;
   const [showDropdown, setShowDropdown] = useState(false);
@@ -125,33 +118,23 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
   }, [updateVariant, position]);
 
   const copyNoteLink = useCallback(async () => {
-      // copy to clipboard
-      try {
-        const key = noteDetails.key;
-        const url = `${window.location.origin}/note/${key}/`;
-        await navigator.clipboard.writeText(url);
-        setCopyText('Copied!');
-        setTimeout(() => {
-          setCopyText('Copy note share link');
-        }, 2000);
-      } catch (err) {
-        console.log('Failed to copy: ', err);
-      }
-    }, [noteDetails]);
+    // copy to clipboard
+    try {
+      const key = noteDetails.key;
+      const url = `${window.location.origin}/note/${key}/`;
+      await navigator.clipboard.writeText(url);
+      setCopyText('Copied!');
+      setTimeout(() => {
+        setCopyText('Copy note share link');
+      }, 2000);
+    } catch (err) {
+      console.log('Failed to copy: ', err);
+    }
+  }, [noteDetails]);
 
   return (
-    <div className={`NOTE_ROOT ${getCanEdit?.() ? 'NOTE_EDITABLE' : '' }`}>
+    <div className={`NOTE_ROOT ${getCanEdit?.() ? 'NOTE_EDITABLE' : ''}`}>
       <a href={noteUrl} data-print-id="note-link" className="NOTE_LINK" />
-      <div className="NOTE_LABELS_CONTAINER">
-        {noteDetails.labels && Array.isArray(noteDetails.labels) && noteDetails.labels.map((label: any) => (
-          <div className="NOTE_LABEL" key={label.id}>
-            {label.parent && label.parent.length > 0 && label.parent.map((parent: any) => (
-              <span key={parent.id}>{`${parent.text}`}<LabelSeperator /></span>
-            ))}
-            {label.text}
-          </div>
-        ))}
-      </div>
       {noteDetails.title && noteDetails.title.length > 0 && (
         <p className="NOTE_TITLE">{noteDetails.title}</p>
       )}
@@ -175,7 +158,7 @@ export const NoteComponent: React.FC<NoteComponentProps> = ({ node, getPosition,
             subtitle={noteDetails.subtitle}
             interviewName={noteDetails.interviewName}
             noteUrl={noteUrl} />
-          {noteDetails.fileType === 'VIDEO' && <VariantDropdown selectedVariant="text" onVariantSelect={onVariantSelect}/>}
+          {noteDetails.fileType === 'VIDEO' && <VariantDropdown selectedVariant="text" onVariantSelect={onVariantSelect} />}
           <button className="more-options-button" onClick={toggleDropdownMenu}><MoreOptionsIcon /></button>
           {showDropdown && (
             <div className="dropdown-content">

@@ -1,6 +1,6 @@
 {
   "name": "remirror-extension-note",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "A note extension built for remirror rich text editor",
   "author": "Santosh Viswanatham",
   "license": "MIT",
@@ -35,5 +35,9 @@
   "dependencies": {
     "@tippyjs/react": "^4.2.6",
     "date-fns": "^2.28.0"
+  },
+  "engines": {
+    "node": "18.16.1",
+    "npm": "9.5.1"
   }
 }
