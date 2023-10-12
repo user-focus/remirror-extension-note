@@ -34,7 +34,7 @@ const ClusterButton = (props: { position: () => number; }) => {
         from: position() + 1,
         to: position() + DEFAULT_CLUSTER_TITLE.length + 2
       }) // select the title
-      .toggleHeading({ level: 2 }) // toggle the heading
+      .toggleHeading({ level: 4 }) // toggle the heading
       .run();
   };
 
